@@ -1,0 +1,33 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <form method="POST">
+
+         <div class="row">
+            <div class="col-sm">
+              <label>收件人資料</label>
+               <textarea name="name-input" rows="5" cols="50">
+            收件者姓名：周宜昌
+聯繫電話：03-8561002
+配送地址：花蓮市國福里福光街347巷56號</textarea>
+            </div>
+            <div class="col-sm">
+              <label>出貨日期</label>
+                <input type="date" class="form-control" id="shippingDate-input" name="shippingDate-input">
+                <br>
+                <label>到貨日期</label>
+                <input type="date" class="form-control" id="arrivalDate-input" name="arrivalDate-input">
+            </div>
+        </div>
+        <button type="submit">新增一筆</button>
+    </form>
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <button id="exportCSV" type="submit">匯出 CSV</button>
+    <button id="test" >測試</button>
+
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <p>{{message}}</p>
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+ {{table|safe}}
+</div>
