@@ -1,20 +1,38 @@
 import flask
 from flask import Flask, render_template
 import pandas as pd
-from Controls import TryParse, getOrderData
+
+import DataParser
+from Controls import getOrderData
 import Controls
+from ReadGoogleExcel import getSpreadSheetData
+
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template("index.html")
-    # return 'Hello, World!'
 
 @app.route('/show_Orders', methods=['GET', 'POST'])
 def show_Orders():
     message = ''
-    if flask.request.method == 'POST':
-        dataPack = TryParse(flask.request.form['name-input'])
+    if 'ImportDataFromGoogleSpread' in flask.request.form:
+        rawDatas = getSpreadSheetData()
+        from DataParser import GoogleSpreadDataParser
+        parser = GoogleSpreadDataParser()
+        arrivalDate = str(flask.request.form['GoogleSpreadArrivalDate-input'])
+        import datetime
+        arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y-%m-%d")
+        strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
+        for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
+            dataPack = parser.parse(row)
+            Controls.addNewOrderData(dataPack)
+
+    elif 'ClearAllOrders' in flask.request.form:
+        Controls.clearOrderData()
+    elif 'addNewOrder' in flask.request.form:
+        parser = DataParser.ReDataParser()
+        dataPack = parser.parse(flask.request.form['name-input'])
         dataPack.shippingDate = str(flask.request.form['shippingDate-input']).replace('-', '/')
         dataPack.arrivalDate = str(flask.request.form['arrivalDate-input']).replace('-', '/')
         message = dataPack.formatString()

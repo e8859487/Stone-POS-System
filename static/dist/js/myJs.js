@@ -53,6 +53,7 @@ $(function() {
         var month = ("0" + (f.getMonth() + 1)).slice(-2);
         var tomorrow = f.getFullYear()+"-"+(month)+"-"+(day) ;
         $('#arrivalDate-input').val(tomorrow);
+        $('#GoogleSpreadArrivalDate-input').val(tomorrow);
     }
     $("#shippingDate-input").on("input", updateArrivalDate);
 
