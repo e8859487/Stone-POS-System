@@ -21,24 +21,27 @@ class DataPack(object):
         self.name = None
         self.address = None
         self.mPhone = None
-        self.Phone = None
+        self.phone = None
         self.shippingDate = ""
         self.arrivalDate = ""
         self.arrivalTime = "1"
-        self.numbersOfPack = "1"
+        self.numbersOfPack = "0"
+        self.numbers = '0'  # TODO: adjust value according to numbersOfPack
+        self.paymentMethod = ''
+        self.userComment = ''
 
     def formatString(self):
         return "{name}  {Phone} {mPhone}    {address}".format(
             name=self.name,
             address=self.address,
             mPhone=self.mPhone,
-            Phone=self.Phone)
+            Phone=self.phone)
 
     def createPdData(self):
         DataPack.TableIndex += 1
         return pd.DataFrame({
                             "收件人姓名": self.name,
-                            "收件人電話": self.Phone,
+                            "收件人電話": self.phone,
                             "收件人手機": self.mPhone,
                             "收件人地址": self.address,
                             "代收金額或到付": "",

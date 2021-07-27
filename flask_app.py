@@ -4,7 +4,7 @@ import pandas as pd
 import DataParser
 from Controls import getOrderData
 import Controls
-from ReadGoogleExcel import getSpreadSheetData
+from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet
 import GlobalSettings
 
 app = Flask(__name__)
@@ -19,6 +19,14 @@ key = os.urandom(16)
 def index():
     return render_template("index.html")
 
+@app.route('/demoDashboard')
+def demoDashboard():
+    return render_template("index_demo.html")
+
+@app.route('/demoNavBar')
+def demoNavBar():
+    return render_template("index_navBars.html")
+
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():
     message = ''
@@ -31,36 +39,30 @@ def show_orders():
         arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y-%m-%d")
         strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
         for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
-            dataPack = parser.parse(row)
+            parser.setData(row)
+            dataPack = parser.parse()
             Controls.addNewOrderData(dataPack)
 
     elif 'ClearAllOrders' in flask.request.form:
         Controls.clearOrderData()
     elif 'addNewOrder' in flask.request.form:
         parser = DataParser.ReDataParser()
-        dataPack = parser.parse(flask.request.form['name-input'])
+        parser.setData(flask.request.form['name-input'])
+        dataPack = parser.parse()
         dataPack.shippingDate = str(flask.request.form['shippingDate-input']).replace('-', '/')
         dataPack.arrivalDate = str(flask.request.form['arrivalDate-input']).replace('-', '/')
         message = dataPack.formatString()
         Controls.addNewOrderData(dataPack)
-    orderedDoc = render_template('Ordered.html', table=getOrderData(), message=message)
+    orderedDoc = render_template('showOrders.html', table=getOrderData(), message=message)
     return render_template('index.html', table=orderedDoc)
 
-@app.route("/tables")
-def show_tables():
-    a = pd.read_csv("0525.csv", encoding='utf-8')
-    orderedDoc = render_template('Ordered.html', table=a.to_html())
-
-
-    return render_template('view.html', table=str(soup))
-
-    data = pd.read_excel('dummy.xlsx')
-    data.set_index(['Name'], inplace=True)
-    data.index.name=None
-    females = data.loc[data.Gender=='f']
-    males = data.loc[data.Gender=='m']
-    return render_template('view.html',tables=[females.to_html(classes='female'), males.to_html(classes='male')],
-    titles = ['na', 'Female surfers', 'Male surfers'])
+@app.route('/new_orders', methods=['GET', 'POST'])
+def new_orders():
+    if 'addNewOrder' in flask.request.form:
+        AddSpreadSheetData([['123']])
+        #CreateSheet()
+    orderedDoc = render_template('newOrders.html', table=getOrderData())
+    return render_template('index.html', table=orderedDoc)
 
 # === Google API ===
 import GlobalSettings
@@ -72,8 +74,8 @@ import google_auth_oauthlib.flow
 SettingFilePath = pathlib.Path(__file__).parent.joinpath("key.json")
 SCOPES = [GlobalSettings.Scopes]
 
-@app.route('/new_orders')
-def new_orders():
+@app.route('/OAuth2')
+def OAuth2():
     return render_template('index.html', table=print_index_table())
 
 # This variable specifies the name of a file that contains the OAuth 2.0
@@ -140,16 +142,22 @@ def revoke():
 
     status_code = getattr(revoke, 'status_code')
     if status_code == 200:
-        return ('Credentials successfully revoked.' + print_index_table())
+        wording = ('Credentials successfully revoked.' + print_index_table())
     else:
-        return ('An error occurred.' + print_index_table())
+        wording = ('An error occurred.' + print_index_table())
+
+    return render_template('index.html', table=wording)
+
 
 @app.route('/clear')
 def clear_credentials():
     if 'credentials' in flask.session:
         del flask.session['credentials']
-    return ('Credentials have been cleared.<br><br>' +
+
+    wording =  ('Credentials have been cleared.<br><br>' +
             print_index_table())
+    return render_template('index.html', table=wording)
+
 
 def credentials_to_dict(credentials):
     return {'token': credentials.token,

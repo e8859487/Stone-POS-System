@@ -16,3 +16,4 @@ SendersMobilePhone = config['DataPack']['SendersMobilePhone']
 
 Scopes = config['GoogleSpreadSheet']['SCOPES']
 SAMPLE_SPREADSHEET_ID_input = config['GoogleSpreadSheet']['SAMPLE_SPREADSHEET_ID_input']
+TEST_SPREADSHEET_ID_input = config['GoogleSpreadSheet']['TEST_SPREADSHEET_ID_input']

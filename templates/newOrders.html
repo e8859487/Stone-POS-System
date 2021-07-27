@@ -1,0 +1,101 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div class="row">
+    <form method="POST">
+     <div class="row">
+        <div class="col-sm">
+          <label>收件人資料</label>
+            <br>
+           <textarea name="name-input" rows="5" cols="50">
+       </textarea>
+        </div>
+        <div class="col-sm">
+         <div class="row">
+             <div class="col-sm">
+                 <label>出貨日期</label>
+                 <input type="date" class="form-control" id="shippingDate-input" name="shippingDate-input">
+             </div>
+             <div class="col-sm">
+                <label>到貨日期</label>
+                <input type="date" class="form-control" id="arrivalDate-input" name="arrivalDate-input">
+            </div>
+         </div>
+        <br>
+
+         <div class="row">
+             <div class="col-sm">
+                <label>姓名</label>
+                <input type="text" class="form-control" id="name-input" name="name-input">
+            </div>
+             <div class="col-sm">
+                <label>數量</label>
+                 <input type="number" class="form-control" id="numbers-input" name="numbers-input" step="1"
+                 min="1" max="50" value="4">
+            </div>
+         </div>
+            <br>
+
+            <div class="row">
+             <div class="col-sm">
+                 <label>聯絡電話 (04-88xxxxxx)</label>
+                <input type="tel" class="form-control" id="phone-input" name="phone-input">
+            </div>
+             <div class="col-sm">
+                <label>手機 (09xx-xxx-xxx)</label>
+                <input type="tel" class="form-control" id="mPhone-input" name="mPhone-input">
+            </div>
+         </div>
+            <br>
+            <label>付款方式</label>
+            <br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="PaymentMethod-input" id="cashOnDelivery-input" value="貨到付款" checked>
+              <label class="form-check-label" for="cashOnDelivery-input">貨到付款</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="PaymentMethod-input" id="transfer-input" value="轉帳">
+              <label class="form-check-label" for="transfer-input">轉帳</label>
+            </div>
+    <!--                <input type="radio" class="form-control" id="cashOnDelivery-input" name="PaymentMethod-input" value="貨到付款">-->
+    <!--                貨到付款-->
+    <!--                <input type="radio" class="form-control" id="transfer-input" name="PaymentMethod-input" checked value="轉帳">-->
+    <!--                轉帳-->
+            <br><br>
+            <label>其他需求</label>
+            <input type="text" class="form-control" id="userComment-input" name="userComment-input">
+        </div>
+    </div>
+    <button type="submit" name="addNewOrder">新增一筆</button>
+    </form>
+    </div>
+
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+
+    <form method="post">
+        <label>匯入資料日期</label>
+        <input type="date" class="form-control" id="GoogleSpreadArrivalDate-input" name="GoogleSpreadArrivalDate-input">
+        <input type="submit" name="ImportDataFromGoogleSpread" value="從Google表單匯入"/>
+    </form>
+
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+     <div class="row">
+         <div class="col-sm">
+             <button id="exportCSV" type="submit">匯出 CSV</button>
+         </div>
+         <div class="col-sm">
+            <button id="test" >測試</button>
+         </div>
+         <div class="col-sm">
+            <form method="post">
+                <input type="submit" name="ClearAllOrders" value="清除所有資料"/>
+            </form>
+         </div>
+      </div>
+    <div class="row">
+        <p>{{message}}</p>
+     </div>
+</div>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+ {{table|safe}}
+</div>
