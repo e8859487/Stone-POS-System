@@ -1,10 +1,7 @@
-from flask import Flask, render_template
-import pandas as pd
-
+from flask import Flask, render_template, jsonify
 import DataParser
-from Controls import getOrderData
 import Controls
-from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet
+from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService
 import GlobalSettings
 
 app = Flask(__name__)
@@ -12,8 +9,6 @@ app = Flask(__name__)
 # If you use this code in your application, replace this with a truly secret
 # key. See https://flask.palletsprojects.com/quickstart/#sessions.
 app.secret_key = GlobalSettings.FlaskSecretKey
-import os
-key = os.urandom(16)
 
 @app.route('/')
 def index():
@@ -27,41 +22,73 @@ def demoDashboard():
 def demoNavBar():
     return render_template("index_navBars.html")
 
+@app.route('/api_parseData', methods=['GET', 'POST'])
+def parseData():
+    parser = DataParser.ReDataParser()
+    parser.setData(flask.request.form['misc-input'])
+    dataPack = parser.parse()
+    retDict = {"success": 200, "msg": "上傳成功"}
+    retDict.update(dataPack.toDict())
+    return jsonify(retDict)
+
+@app.route('/api_addNewData', methods=['GET', 'POST'])
+def addNewDataToGoogleSpreadSheet():
+    parser = DataParser.HtmlFormDataParser()
+    parser.setData(flask.request.form)
+    dataPack = parser.parse()
+    isSuccess = AddSpreadSheetData(dataPack.toGoogleSpreadSheetFormat())
+    if isSuccess:
+        return jsonify({"isSuccess": True, "msg": "上傳成功"})
+    return jsonify({"isSuccess": False, "msg": "上傳失敗"})
+
+@app.route('/api_importDataFromGoogleSpread', methods=['GET', 'POST'])
+def importDataFromGoogleSpread():
+    # if 'ImportDataFromGoogleSpread' in flask.request.form:
+    arrivalDate = str(flask.request.form['GoogleSpreadArrivalDate-input'])
+    if arrivalDate == "":
+        return jsonify({"isSuccess": False, "msg": "請選擇日期！"})
+
+    Controls.clearOrderData()
+    rawDatas = getSpreadSheetData()
+    from DataParser import GoogleSpreadDataParser
+    parser = GoogleSpreadDataParser()
+
+    import datetime
+    arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y-%m-%d")
+    strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
+    for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
+        parser.setData(row)
+        dataPack = parser.parse()
+        Controls.addNewOrderData(dataPack)
+
+    retDict = {"isSuccess": True, "data": Controls.getOrderData()}
+    return retDict
+
+    parser = DataParser.HtmlFormDataParser()
+    parser.setData(flask.request.form)
+    dataPack = parser.parse()
+    isSuccess = AddSpreadSheetData(dataPack.toGoogleSpreadSheetFormat())
+    if isSuccess:
+        return jsonify({"isSuccess": True, "msg": "上傳成功"})
+    return jsonify({"isSuccess": False, "msg": "上傳失敗"})
+
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():
+    if not initService():
+        return flask.redirect('authorize')
     message = ''
-    if 'ImportDataFromGoogleSpread' in flask.request.form:
-        rawDatas = getSpreadSheetData()
-        from DataParser import GoogleSpreadDataParser
-        parser = GoogleSpreadDataParser()
-        arrivalDate = str(flask.request.form['GoogleSpreadArrivalDate-input'])
-        import datetime
-        arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y-%m-%d")
-        strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
-        for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
-            parser.setData(row)
-            dataPack = parser.parse()
-            Controls.addNewOrderData(dataPack)
-
-    elif 'ClearAllOrders' in flask.request.form:
+    if 'ClearAllOrders' in flask.request.form:
         Controls.clearOrderData()
-    elif 'addNewOrder' in flask.request.form:
-        parser = DataParser.ReDataParser()
-        parser.setData(flask.request.form['name-input'])
-        dataPack = parser.parse()
-        dataPack.shippingDate = str(flask.request.form['shippingDate-input']).replace('-', '/')
-        dataPack.arrivalDate = str(flask.request.form['arrivalDate-input']).replace('-', '/')
-        message = dataPack.formatString()
-        Controls.addNewOrderData(dataPack)
-    orderedDoc = render_template('showOrders.html', table=getOrderData(), message=message)
+
+    orderedDoc = render_template('showOrders.html', message=message)
     return render_template('index.html', table=orderedDoc)
 
 @app.route('/new_orders', methods=['GET', 'POST'])
 def new_orders():
-    if 'addNewOrder' in flask.request.form:
-        AddSpreadSheetData([['123']])
-        #CreateSheet()
-    orderedDoc = render_template('newOrders.html', table=getOrderData())
+    if not initService():
+        return flask.redirect('authorize')
+
+    orderedDoc = render_template('newOrders.html')
     return render_template('index.html', table=orderedDoc)
 
 # === Google API ===

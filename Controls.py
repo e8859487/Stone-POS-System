@@ -14,13 +14,15 @@ def addNewOrderData(dataPack):
 
 def getOrderData():
     if isinstance(dataTable, DataFrame):
+        # change table style
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(dataTable.to_html(table_id="OrderTable", index=False), "html.parser")
-        soup.find('table')['contenteditable'] = 'true'
-
+        soup = BeautifulSoup(dataTable.to_html(table_id="OrderTable", index=False, classes="table table-hover table-bordered"), "html.parser")
+        # soup.find('table')['contenteditable'] = 'true'          # make it editable
+        #
         tableHeaders = soup.findAll('th')
         for th in tableHeaders:
-            th['contenteditable'] = 'false'
+            th['class'] = "table-light"
+            # th['contenteditable'] = 'false'
         return str(soup)
     return ""
 

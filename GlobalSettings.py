@@ -13,6 +13,7 @@ FlaskSecretKey = config['default']['FlaskSecretKey']
 Sender = config['DataPack']['Sender']
 SendersAddress = config['DataPack']['SendersAddress']
 SendersMobilePhone = config['DataPack']['SendersMobilePhone']
+SalePrice = config['DataPack']['SalePrice']
 
 Scopes = config['GoogleSpreadSheet']['SCOPES']
 SAMPLE_SPREADSHEET_ID_input = config['GoogleSpreadSheet']['SAMPLE_SPREADSHEET_ID_input']

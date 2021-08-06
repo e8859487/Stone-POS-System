@@ -32,7 +32,7 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                SettingFilePath.as_posix(), SCOPES) # here enter the name of your downloaded JSON file
+                SettingFilePath.as_posix(), SCOPES)  # here enter the name of your downloaded JSON file
             creds = flow.run_local_server()
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
@@ -42,11 +42,12 @@ def main():
     # Call the Sheets API
     sheet = service.spreadsheets()
     result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
-                                range=SAMPLE_RANGE_NAME).execute()
+                                      range=SAMPLE_RANGE_NAME).execute()
     values_input = result_input.get('values', [])
 
     # if not values_input and not values_expansion:
     #     print('No data found.')
+
 
 def credentials_to_dict(credentials):
     return {'token': credentials.token,
@@ -56,13 +57,14 @@ def credentials_to_dict(credentials):
             'client_secret': credentials.client_secret,
             'scopes': credentials.scopes}
 
+
 def initService():
     import google.oauth2.credentials
     global values_input, service
     if service is not None:
-        return
+        return True
     if 'credentials' not in flask.session:
-        return flask.redirect('authorize')
+        return False
 
         # Load credentials from the session.
     creds = google.oauth2.credentials.Credentials(
@@ -85,10 +87,13 @@ def initService():
     service = build('sheets', 'v4', credentials=creds)
     flask.session['credentials'] = credentials_to_dict(creds)
     CreateSheet()
+    return True
+
 
 def querySpreadSheetData():
     global service
-    initService()
+    if not initService():
+        return
 
     # Call the Sheets API
     sheet = service.spreadsheets()
@@ -103,7 +108,8 @@ def getSpreadSheetData():
 
 def CreateSheet():
     global service
-    initService()
+    if not initService():
+        return
 
     #  check sheet existence
     spreadSheets = service.spreadsheets().get(spreadsheetId=TEST_SPREADSHEET_ID_input).execute()
@@ -130,7 +136,7 @@ def CreateSheet():
         print("Create New sheet:", AUTO_FILL_TABLE_NAME)
         AddSpreadSheetData([['時間戳記', '收件人', '到貨日期', '指定到貨時段', '住址',
                              '聯絡電話 (04-88xxxxxx)', '手機 (09xx-xxx-xxx)',
-                             '數量',	'付款方式', '其他需求',
+                             '數量', '付款方式', '其他需求',
                              '備註', '數量分析', '出貨日期', '套袋']])
 
 def AddSpreadSheetData(rowDatas):
@@ -143,7 +149,8 @@ def AddSpreadSheetData(rowDatas):
     '''
     from pprint import pprint
     global service
-    initService()
+    if not initService():
+        return
 
     # The A1 notation of a range to search for a logical table of data.
     # Values will be appended after the last row of the table.
@@ -166,11 +173,11 @@ def AddSpreadSheetData(rowDatas):
         valueInputOption=value_input_option,
         insertDataOption=insert_data_option, body=value_range_body)
     response = request.execute()
+    return response
 
     # pprint(response)
 
 
-
 if __name__ == '__main__':
-    AddSpreadSheetData()
-
+    # AddSpreadSheetData()
+    pass

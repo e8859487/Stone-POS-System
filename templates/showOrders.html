@@ -1,50 +1,35 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <form method="POST">
-
-         <div class="row">
+    <div class="row">
+        <form id="queryForm" method="post">
             <div class="col-sm">
-              <label>收件人資料</label>
-               <textarea name="name-input" rows="5" cols="50">
-           </textarea>
+                <label>匯入資料日期</label>
+                <input type="date" class="form-control" id="GoogleSpreadArrivalDate-input" name="GoogleSpreadArrivalDate-input">
             </div>
+
+            <br>
             <div class="col-sm">
-              <label>出貨日期</label>
-                <input type="date" class="form-control" id="shippingDate-input" name="shippingDate-input">
-                <br>
-                <label>到貨日期</label>
-                <input type="date" class="form-control" id="arrivalDate-input" name="arrivalDate-input">
+                <input id="importDataFromGoogleSpread" type="button" name="ImportDataFromGoogleSpread" value="從Google表單匯入"/>
+                <button id="exportCSV" type="button">匯出 CSV</button>
             </div>
-        </div>
-        <button type="submit" name="addNewOrder">新增一筆</button>
-    </form>
-</div>
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-
-    <form method="post">
-        <label>匯入資料日期</label>
-        <input type="date" class="form-control" id="GoogleSpreadArrivalDate-input" name="GoogleSpreadArrivalDate-input">
-        <input type="submit" name="ImportDataFromGoogleSpread" value="從Google表單匯入"/>
-    </form>
-
-</div>
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-     <div class="row">
-         <div class="col-sm">
-             <button id="exportCSV" type="submit">匯出 CSV</button>
-         </div>
-         <div class="col-sm">
-            <button id="test" >測試</button>
-         </div>
-         <div class="col-sm">
-            <form method="post">
-                <input type="submit" name="ClearAllOrders" value="清除所有資料"/>
-            </form>
-         </div>
+        </form>
+    </div>
+    <div class="row">
+<!--         <div class="col-sm">-->
+<!--            <button id="test" >測試</button>-->
+<!--         </div>-->
+<!--         <div class="col-sm">-->
+<!--            <form method="post">-->
+<!--                <input type="submit" name="ClearAllOrders" value="清除所有資料"/>-->
+<!--            </form>-->
+<!--         </div>-->
       </div>
     <div class="row">
         <p>{{message}}</p>
      </div>
 </div>
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<!--<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">-->
+<!--     -->
+<!--</div>-->
+<div id = "queryResponse" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
  {{table|safe}}
 </div>
