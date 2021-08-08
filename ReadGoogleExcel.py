@@ -15,7 +15,7 @@ SCOPES = [GlobalSettings.Scopes]
 SAMPLE_SPREADSHEET_ID_input = GlobalSettings.SAMPLE_SPREADSHEET_ID_input
 TEST_SPREADSHEET_ID_input = GlobalSettings.TEST_SPREADSHEET_ID_input
 SAMPLE_RANGE_NAME = 'A1:AA1000'
-SHEET_RESPONSE_RANGE = '表單回應 1!A1:R208'  # filled by customers
+SHEET_RESPONSE_RANGE = '表單回應 1!A1:R999'  # filled by customers
 AUTO_FILL_TABLE_NAME = '全自動資料表'
 WEBSITE_RESPONSE_RANGE = '{}!A1:R208'.format(AUTO_FILL_TABLE_NAME)  # filled from website
 
@@ -57,18 +57,54 @@ def credentials_to_dict(credentials):
             'client_secret': credentials.client_secret,
             'scopes': credentials.scopes}
 
+class GoogleServiceMgr(object):
+
+    def __init__(self):
+        self._credential = None
+
+    @property
+    def credientials(self):
+        creds = None
+        if os.path.exists('token.pickle'):
+            with open('token.pickle', 'rb') as token:
+                creds = pickle.load(token)
+
+        if not creds or not creds.valid:
+            # if creds and creds.expired and creds.refresh_token:
+            return None
+        return credentials_to_dict(creds)
+                # creds.refresh(Request())
+        # return self._credential
+
+    @credientials.setter
+    def credientials(self, cred):
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(cred, token)
+
+        # if cred is reset
+        if cred is None:
+            global service
+            service = None
+        # self._credential = cred
+
+GoogleMgr = GoogleServiceMgr()
+
 
 def initService():
     import google.oauth2.credentials
     global values_input, service
     if service is not None:
         return True
-    if 'credentials' not in flask.session:
+    # if 'credentials' not in flask.session:
+    #     return False
+    if GoogleMgr.credientials is None:
         return False
 
         # Load credentials from the session.
+    # creds = google.oauth2.credentials.Credentials(
+    #     **flask.session['credentials'])
     creds = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
+        **GoogleMgr.credientials)
 
     # creds = None
     # if os.path.exists('token.pickle'):
@@ -85,7 +121,7 @@ def initService():
     #         pickle.dump(creds, token)
     #
     service = build('sheets', 'v4', credentials=creds)
-    flask.session['credentials'] = credentials_to_dict(creds)
+    # flask.session['credentials'] = credentials_to_dict(creds)
     CreateSheet()
     return True
 

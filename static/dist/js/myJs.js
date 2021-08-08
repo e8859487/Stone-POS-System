@@ -140,6 +140,11 @@ $(function() {
                         radiobtn = document.getElementById("transfer-input");
                         radiobtn.checked = true;
                     }
+
+                    // clear input textarea
+                    $("#orderForm > div > div:nth-child(1) > textarea").val("")
+                    // reset response text
+                    $("#lblAddDataResponse").text("")
             },
             error:function(e){
                     alert("error", e);
@@ -217,4 +222,5 @@ $( "#btnAddNewOrder" ).on( "click", function(){
     var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
     $('#shippingDate-input').val(today);
     updateArrivalDate()
+
 });

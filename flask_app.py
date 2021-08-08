@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
 import DataParser
 import Controls
-from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService
+from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService, GoogleMgr
 import GlobalSettings
 
 app = Flask(__name__)
@@ -12,15 +12,7 @@ app.secret_key = GlobalSettings.FlaskSecretKey
 
 @app.route('/')
 def index():
-    return render_template("index.html")
-
-@app.route('/demoDashboard')
-def demoDashboard():
-    return render_template("index_demo.html")
-
-@app.route('/demoNavBar')
-def demoNavBar():
-    return render_template("index_navBars.html")
+    return render_template("index.html", NavIndex=1)
 
 @app.route('/api_parseData', methods=['GET', 'POST'])
 def parseData():
@@ -81,7 +73,7 @@ def show_orders():
         Controls.clearOrderData()
 
     orderedDoc = render_template('showOrders.html', message=message)
-    return render_template('index.html', table=orderedDoc)
+    return render_template('index.html', table=orderedDoc, NavIndex=1)
 
 @app.route('/new_orders', methods=['GET', 'POST'])
 def new_orders():
@@ -89,7 +81,7 @@ def new_orders():
         return flask.redirect('authorize')
 
     orderedDoc = render_template('newOrders.html')
-    return render_template('index.html', table=orderedDoc)
+    return render_template('index.html', table=orderedDoc, NavIndex=2)
 
 # === Google API ===
 import GlobalSettings
@@ -103,7 +95,7 @@ SCOPES = [GlobalSettings.Scopes]
 
 @app.route('/OAuth2')
 def OAuth2():
-    return render_template('index.html', table=print_index_table())
+    return render_template('index.html', table=print_index_table(), NavIndex=3)
 
 # This variable specifies the name of a file that contains the OAuth 2.0
 # information for this application, including its client_id and client_secret.
@@ -149,19 +141,23 @@ def oauth2callback():
     # Store credentials in the session.
     # ACTION ITEM: In a production app, you likely want to save these
     #              credentials in a persistent database instead.
-    credentials = flow.credentials
-    flask.session['credentials'] = credentials_to_dict(credentials)
+    # credentials = flow.credentials
+    GoogleMgr.credientials = flow.credentials
+    # flask.session['credentials'] = credentials_to_dict(credentials)
 
     return flask.redirect(flask.url_for('show_orders'))
 
 @app.route('/revoke')
 def revoke():
-    if 'credentials' not in flask.session:
+    if GoogleMgr.credientials is None:
         return ('You need to <a href="/authorize">authorize</a> before ' +
                 'testing the code to revoke credentials.')
 
     credentials = google.oauth2.credentials.Credentials(
-        **flask.session['credentials'])
+        **GoogleMgr.credientials)
+
+    # credentials = google.oauth2.credentials.Credentials(
+    #      **flask.session['credentials'])
 
     revoke = requests.post('https://oauth2.googleapis.com/revoke',
                            params={'token': credentials.token},
@@ -178,8 +174,10 @@ def revoke():
 
 @app.route('/clear')
 def clear_credentials():
-    if 'credentials' in flask.session:
-        del flask.session['credentials']
+    GoogleMgr.credientials = None
+
+    # if 'credentials' in flask.session:
+    #     del flask.session['credentials']
 
     wording =  ('Credentials have been cleared.<br><br>' +
             print_index_table())
@@ -192,7 +190,8 @@ def credentials_to_dict(credentials):
             'token_uri': credentials.token_uri,
             'client_id': credentials.client_id,
             'client_secret': credentials.client_secret,
-            'scopes': credentials.scopes}
+            'scopes': credentials.scopes,
+            'valid': credentials.valid}
 
 def print_index_table():
     return ('<table>' +
