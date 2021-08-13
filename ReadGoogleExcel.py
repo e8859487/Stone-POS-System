@@ -142,6 +142,13 @@ def getSpreadSheetData():
     spreadSheetData = querySpreadSheetData()
     return pd.DataFrame(spreadSheetData[1:], columns=spreadSheetData[0])
 
+def getSpreadSheetDataUniteDates():
+    spreadSheetData = querySpreadSheetData()
+    dateSets = set()
+    for row in spreadSheetData[1:]:
+        dateSets.add(row[2])
+    return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
+
 def CreateSheet():
     global service
     if not initService():

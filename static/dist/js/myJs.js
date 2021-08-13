@@ -206,13 +206,15 @@ $( "#btnAddNewOrder" ).on( "click", function(){
 
 // Update UI
     function updateArrivalDate(Text){
-      var from = $("#shippingDate-input").val().split("-")
-        var f = new Date(from[0], from[1]-1, parseInt(from[2])+1)
-        var day = ("0" + f.getDate()).slice(-2);
-        var month = ("0" + (f.getMonth() + 1)).slice(-2);
-        var tomorrow = f.getFullYear()+"-"+(month)+"-"+(day) ;
-        $('#arrivalDate-input').val(tomorrow);
-        $('#GoogleSpreadArrivalDate-input').val(tomorrow);
+        if ($("#shippingDate-input").val()){
+            var from = $("#shippingDate-input").val().split("-")
+            var f = new Date(from[0], from[1]-1, parseInt(from[2])+1)
+            var day = ("0" + f.getDate()).slice(-2);
+            var month = ("0" + (f.getMonth() + 1)).slice(-2);
+            var tomorrow = f.getFullYear()+"-"+(month)+"-"+(day) ;
+            $('#arrivalDate-input').val(tomorrow);
+            $('#GoogleSpreadArrivalDate-input').val(tomorrow);
+        }
     }
     $("#shippingDate-input").on("input", updateArrivalDate);
 
@@ -222,5 +224,12 @@ $( "#btnAddNewOrder" ).on( "click", function(){
     var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
     $('#shippingDate-input').val(today);
     updateArrivalDate()
+
+
+//    $('#GoogleSpreadArrivalDate-input').on('changeDate', function() {
+//    $('#my_hidden_input').val(
+//        $('#datepicker').datepicker('getFormattedDate')
+//    );
+//});
 
 });

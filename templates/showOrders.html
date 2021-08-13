@@ -3,7 +3,13 @@
         <form id="queryForm" method="post">
             <div class="col-sm">
                 <label>匯入資料日期</label>
-                <input type="date" class="form-control" id="GoogleSpreadArrivalDate-input" name="GoogleSpreadArrivalDate-input">
+                <div class="input-group date" id="GoogleSpreadArrivalDate-input">
+                  <input type="text" class="form-control" name="GoogleSpreadArrivalDate-input">
+                    <span class="input-group-addon">
+                        <i class="glyphicon glyphicon-th feather featherCalender" data-feather="calendar">
+                        </i>
+                    </span>
+                </div>
             </div>
 
             <br>
@@ -31,5 +37,5 @@
 <!--     -->
 <!--</div>-->
 <div id = "queryResponse" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
- {{table|safe}}
+ {{tableorderDates}}
 </div>

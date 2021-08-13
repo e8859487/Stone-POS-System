@@ -28,6 +28,8 @@
     </style>
     <!-- Custom styles for this template -->
     <link href="../static/dist/css/dashboard.css" rel="stylesheet">
+    <link href="../static/dist/css/bootstrap-datepicker3.standalone.css" rel="stylesheet">
+    <link href="../static/style.css" rel="stylesheet">
   </head>
 
   <body>
@@ -143,12 +145,15 @@
     <script src="../static/dist/js/myJs.js?v={{range(1, 5100) | random }}"></script>
     <!-- table 2 csv-->
     <script src="../static/dist/js/table2csv.min.js"></script>
+    <script src="../static/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="../static/dist/js/bootstrap-datepicker.zh-TW.min.js"></script>
 
     <!-- Icons -->
     <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js" integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE" crossorigin="anonymous"></script>
     <script src="../static/dashboard.js"></script>
-
     <script>
+        feather.replace()
+
         function UpdateNavSelection() {
           if ("{{ NavIndex }}" == 1) {
             $("#sidebarMenu > div > ul > li:nth-child(1) > a").addClass("active")
@@ -162,6 +167,6 @@
         }
         UpdateNavSelection()
     </script>
-
+    {{SubPageJS|safe}}
   </body>
 </html>

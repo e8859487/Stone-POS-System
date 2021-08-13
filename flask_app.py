@@ -1,7 +1,8 @@
 from flask import Flask, render_template, jsonify
 import DataParser
 import Controls
-from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService, GoogleMgr
+from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService, GoogleMgr, \
+    getSpreadSheetDataUniteDates
 import GlobalSettings
 
 app = Flask(__name__)
@@ -39,18 +40,19 @@ def importDataFromGoogleSpread():
     arrivalDate = str(flask.request.form['GoogleSpreadArrivalDate-input'])
     if arrivalDate == "":
         return jsonify({"isSuccess": False, "msg": "請選擇日期！"})
-
+    arrivalDate = arrivalDate.split(' ')[0]
     Controls.clearOrderData()
     rawDatas = getSpreadSheetData()
     from DataParser import GoogleSpreadDataParser
     parser = GoogleSpreadDataParser()
 
     import datetime
-    arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y-%m-%d")
+    arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y/%m/%d")
     strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
     for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
         parser.setData(row)
         dataPack = parser.parse()
+        # TODO : remove global varable Controls
         Controls.addNewOrderData(dataPack)
 
     retDict = {"isSuccess": True, "data": Controls.getOrderData()}
@@ -71,9 +73,11 @@ def show_orders():
     message = ''
     if 'ClearAllOrders' in flask.request.form:
         Controls.clearOrderData()
-
-    orderedDoc = render_template('showOrders.html', message=message)
-    return render_template('index.html', table=orderedDoc, NavIndex=1)
+    # https://stackoverflow.com/questions/15321431/how-to-pass-a-list-from-python-by-jinja2-to-javascript
+    OrderDateList = getSpreadSheetDataUniteDates()
+    orderedDoc = render_template('showOrders.html', message=message )
+    SubPageJS = render_template('partial_showOrder.js', orderDates=OrderDateList )
+    return render_template('index.html', table=orderedDoc, NavIndex=1, SubPageJS=SubPageJS)
 
 @app.route('/new_orders', methods=['GET', 'POST'])
 def new_orders():
