@@ -224,12 +224,4 @@ $( "#btnAddNewOrder" ).on( "click", function(){
     var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
     $('#shippingDate-input').val(today);
     updateArrivalDate()
-
-
-//    $('#GoogleSpreadArrivalDate-input').on('changeDate', function() {
-//    $('#my_hidden_input').val(
-//        $('#datepicker').datepicker('getFormattedDate')
-//    );
-//});
-
 });

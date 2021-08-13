@@ -3,11 +3,14 @@
     <form id="orderForm" method="POST">
      <div class="row">
         <div class="col-sm">
-            <label>收件人資料</label>
-            <br>
+            <h5>收件人資料彙整</h5>
             <textarea name="misc-input" rows="5" cols="50"></textarea>
-            <button id="btnPreviewData" type="button">預覽</button>
-        </div>
+            <br>
+            <input id="btnPreviewData" type="button" value="預覽"/>
+        </div></div>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    </div>
+    <div class="row">
         <div class="col-sm">
          <div class="row">
              <div class="col-sm">
@@ -77,11 +80,16 @@
             <br>
             <label>其他需求</label>
             <input type="text" class="form-control" id="userComment-input" name="userComment-input">
+         <br>
         </div>
     </div>
-        <button id="btnAddNewOrder" name="addNewOrder" type="button">新增一筆</button>
+     <div class="row">
+         <br>
+        <input id="btnAddNewOrder" name="addNewOrder" type="button" value="新增一筆" style="
+    width: 100px;"/>
         <br>
         <label id="lblAddDataResponse"></label>
+     </div>
     </form>
     </div>
 

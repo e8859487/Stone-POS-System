@@ -179,7 +179,9 @@ class GoogleSpreadDataParser(ParserBase):
         return PAYMENTMETHOD_TRANSFER
 
     def getUserComment(self):
-        return self.dt[1][8]
+        if self.dt[1][8]:
+            return self.dt[1][8]
+        return ""
 
 class HtmlFormDataParser(ParserBase):
     def getName(self):

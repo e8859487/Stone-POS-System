@@ -7,7 +7,7 @@
            var minDt = new Date(enableDatesArray[0]);
            var maxDt = new Date(enableDatesArray[enableDatesArray["length"]-1]);
            $('#GoogleSpreadArrivalDate-input').datepicker({
-                  format: "yyyy/mm/dd",
+                  format: "yyyy/mm/dd (DD)",
                   autoclose: true,
                   startDate: minDt,
                   endDate: maxDt,
