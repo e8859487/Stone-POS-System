@@ -72,6 +72,8 @@ class GoogleServiceMgr(object):
         if not creds or not creds.valid:
             # if creds and creds.expired and creds.refresh_token:
             return None
+
+
         return credentials_to_dict(creds)
                 # creds.refresh(Request())
         # return self._credential
@@ -131,15 +133,23 @@ def querySpreadSheetData():
     if not initService():
         return
 
+    values_input = list()
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
-                                      range=SAMPLE_RANGE_NAME).execute()
-    values_input = result_input.get('values', [])
+    for sheetRange in (SHEET_RESPONSE_RANGE, AUTO_FILL_TABLE_NAME):
+        result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
+                                      range=sheetRange).execute()
+        if len(values_input) == 0:
+            values_input += result_input.get('values', [])
+        else:
+            values_input += result_input.get('values', [])[1:]
     return values_input
 
 def getSpreadSheetData():
     spreadSheetData = querySpreadSheetData()
+    for s in spreadSheetData[1:]:
+        while len(s) < len(spreadSheetData[0]):
+            s.append("")
     return pd.DataFrame(spreadSheetData[1:], columns=spreadSheetData[0])
 
 def getSpreadSheetDataUniteDates():
@@ -147,7 +157,7 @@ def getSpreadSheetDataUniteDates():
     dateSets = set()
     for row in spreadSheetData[1:]:
         dateSets.add(row[2])
-    return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
+    return sorted(dateSets, key=lambda d: tuple(map(int, d.replace('-', '/').split('/'))))
 
 def CreateSheet():
     global service

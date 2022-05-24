@@ -142,7 +142,7 @@ $(function() {
                     }
 
                     // clear input textarea
-                    $("#orderForm > div > div:nth-child(1) > textarea").val("")
+                    //$("#orderForm > div > div:nth-child(1) > textarea").val("")
                     // reset response text
                     $("#lblAddDataResponse").text("")
             },

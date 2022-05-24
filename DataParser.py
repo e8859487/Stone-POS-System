@@ -75,12 +75,29 @@ class ReDataParser(ParserBase):
     def getName(self):
         pattern = r"^.+[姓名|收件人].{1}(.*)"
         group = self.search(pattern, self.dt)
-        return group[0].strip() if len(group) > 0 else ""
+        name = group[0].strip() if len(group) > 0 else ""
+
+        if name == "" or len(name) > 10:
+            for line in self.dt.split("\n"):
+                # assume the length of name is less within 2-4
+                if 4 >= len(line) > 1:
+                    name = line
+                    break
+
+        return name
 
     def getAddress(self):
         pattern = r"^.+[地址].{1}(.+[縣市].*)"
         group = self.search(pattern, self.dt)
-        return group[0].strip() if len(group) > 0 else ""
+        address = group[0].strip() if len(group) > 0 else ""
+
+        if address == "" or len(address) < 9:
+            for line in self.dt.split("\n"):
+                # assume the length of name is less within 2-4
+                if len(line) > 9 and (str(line).find("縣") != -1 or str(line).find("市") != -1):
+                    address = line
+                    break
+        return address
 
     def getPhone(self):
         pattern = r"^.+[電話|].{1}(0[^9].*)"
@@ -95,12 +112,26 @@ class ReDataParser(ParserBase):
     def getmPhone(self):
         pattern = r"^.+[電話|手機].{1}(09.*)"
         group = self.search(pattern, self.dt)
+        mPhone = ""
         if len(group) > 0:
             candidate = group[0]
             candidate2 = self.removeWords(candidate, ['-', '(', ')', '－'])
             if len(candidate2) == 10:
-                return '{}-{}-{}'.format(candidate2[:4], candidate2[4:7], candidate2[7:])
-        return group[0].strip() if len(group) > 0 else ""
+                mPhone = '{}-{}-{}'.format(candidate2[:4], candidate2[4:7], candidate2[7:])
+            else:
+                mPhone = group[0].strip() if len(group) > 0 else ""
+
+        if (mPhone == ""):
+            pattern = r".*(09.*)"
+            group = self.search(pattern, self.dt)
+            if len(group) > 0:
+                candidate = group[0]
+                candidate2 = self.removeWords(candidate, ['-', '(', ')', '－'])
+                if len(candidate2) == 10:
+                    mPhone = '{}-{}-{}'.format(candidate2[:4], candidate2[4:7], candidate2[7:])
+                else:
+                    mPhone = group[0].strip() if len(group) > 0 else ""
+        return mPhone
 
     def getShippingDate(self):
         return ""

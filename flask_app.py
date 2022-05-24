@@ -87,6 +87,18 @@ def new_orders():
     orderedDoc = render_template('newOrders.html')
     return render_template('index.html', table=orderedDoc, NavIndex=2)
 
+@app.route('/Others')
+def Others():
+    return render_template('index.html', table=print_sample(), NavIndex=3)
+
+def print_sample():
+    return (('【姓名】<br>'+
+            '【聯繫電話】<br>'+
+            '【配送地址】<br>'+
+            '【數量】箱<br>'+
+            '【付款方式】貨到付款/轉帳<br>'+
+            '【到貨時間】上午/下午<br>'))
+
 # === Google API ===
 import GlobalSettings
 import flask
@@ -99,7 +111,7 @@ SCOPES = [GlobalSettings.Scopes]
 
 @app.route('/OAuth2')
 def OAuth2():
-    return render_template('index.html', table=print_index_table(), NavIndex=3)
+    return render_template('index.html', table=print_index_table(), NavIndex=4)
 
 # This variable specifies the name of a file that contains the OAuth 2.0
 # information for this application, including its client_id and client_secret.
