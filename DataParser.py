@@ -69,7 +69,10 @@ class ReDataParser(ParserBase):
     def search(self, pattern, dt):
         result = re.search(pattern, dt, re.MULTILINE)
         if result is not None:
-            return result.groups()
+            ret = result.groups()
+            if len(ret) == 0:
+                ret = result.group()
+            return ret
         return []
 
     def getName(self):
@@ -80,8 +83,8 @@ class ReDataParser(ParserBase):
         if name == "" or len(name) > 10:
             for line in self.dt.split("\n"):
                 # assume the length of name is less within 2-4
-                if 4 >= len(line) > 1:
-                    name = line
+                if 4 >= len(str(line).strip()) > 1:
+                    name = str(line).strip()
                     break
 
         return name
@@ -94,8 +97,8 @@ class ReDataParser(ParserBase):
         if address == "" or len(address) < 9:
             for line in self.dt.split("\n"):
                 # assume the length of name is less within 2-4
-                if len(line) > 9 and (str(line).find("縣") != -1 or str(line).find("市") != -1):
-                    address = line
+                if len(str(line).strip()) > 9 and (str(line).find("縣") != -1 or str(line).find("市") != -1):
+                    address = str(line).strip()
                     break
         return address
 
@@ -122,11 +125,10 @@ class ReDataParser(ParserBase):
                 mPhone = group[0].strip() if len(group) > 0 else ""
 
         if (mPhone == ""):
-            pattern = r".*(09.*)"
+            pattern = r"[09]{2}.{8}"
             group = self.search(pattern, self.dt)
             if len(group) > 0:
-                candidate = group[0]
-                candidate2 = self.removeWords(candidate, ['-', '(', ')', '－'])
+                candidate2 = self.removeWords(group, ['-', '(', ')', '－'])
                 if len(candidate2) == 10:
                     mPhone = '{}-{}-{}'.format(candidate2[:4], candidate2[4:7], candidate2[7:])
                 else:
@@ -243,10 +245,11 @@ class HtmlFormDataParser(ParserBase):
         return self.dt['mPhone-input']
 
     def getShippingDate(self):
-        return self.dt['shippingDate-input']
+        return '{dt.year}/{dt.month}/{dt.day}'.format(dt=datetime.datetime.strptime(self.dt['shippingDate-input'], "%Y-%m-%d"))
+
 
     def getArrivalDate(self):
-        return self.dt['arrivalDate-input']
+        return '{dt.year}/{dt.month}/{dt.day}'.format(dt=datetime.datetime.strptime(self.dt['arrivalDate-input'], "%Y-%m-%d"))
 
     def getArrivalTime(self):
         if self.dt['arriveTime-input'] == "上午":

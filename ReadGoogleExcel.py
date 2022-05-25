@@ -157,8 +157,9 @@ def getSpreadSheetDataUniteDates():
     dateSets = set()
     for row in spreadSheetData[1:]:
         if len(row) != 0:
-            dateSets.add(row[2])
-    return sorted(dateSets, key=lambda d: tuple(map(int, d.replace('-', '/').split('/'))))
+            dateSets.add(row[2].replace('-', '/'))
+
+    return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
 
 def CreateSheet():
     global service

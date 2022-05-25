@@ -1,7 +1,5 @@
 <script>
 <!--    var calenderPickableDates = {{orderDates|tojson}}-->
-    var enableDates = [{date: "2021-8-10"},{date: "2021-8-12"}];
-
     var enableDatesArray = {{orderDates|tojson}};
     var sortDatesArry = [];
            var minDt = new Date(enableDatesArray[0]);
