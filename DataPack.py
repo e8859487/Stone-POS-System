@@ -74,7 +74,7 @@ class DataPack(object):
                             "收件人地址": self.address,
                             "代收金額或到付": self.payOnDeliveryPrice,
                             "件數": self.numbersOfPack,
-                            "品名(詳參數表)": "6",
+                            "品名(詳參數表)": "4",
                             "備註": self.userComment,
                             "訂單編號": "",
                             "希望配達時間((詳參數表))": self.arrivalTime,
