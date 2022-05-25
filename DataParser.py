@@ -152,11 +152,26 @@ class ReDataParser(ParserBase):
     def getNumbers(self):
         pattern = r"(\d+).*[箱盒]"
         group = self.search(pattern, self.dt)
+        numbers = 0
         if len(group) > 0:
             candidate2 = self.removeWords(group[0], ['箱', '盒', '(', ')', '－'])
             numbers = int(candidate2)
-            return numbers
-        return 0
+
+        if numbers == 0:
+            pattern = r".*(.箱)"
+            group = self.search(pattern, self.dt)
+            if len(group) > 0:
+                try:
+                    candidate2 = self.removeWords(group[0], ['箱', '盒', '(', ')', '－'])
+                    candidate2 = candidate2.replace('二', '2')
+                    candidate2 = candidate2.replace('四', '4')
+                    candidate2 = candidate2.replace('六', '6')
+                    candidate2 = candidate2.replace('八', '8')
+
+                    numbers = int(candidate2)
+                except:
+                    pass
+        return numbers
 
     def getPaymentMethod(self):
         pattern = r".*(貨到付款).*"

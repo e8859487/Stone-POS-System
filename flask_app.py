@@ -34,6 +34,11 @@ def addNewDataToGoogleSpreadSheet():
         return jsonify({"isSuccess": True, "msg": "上傳成功"})
     return jsonify({"isSuccess": False, "msg": "上傳失敗"})
 
+@app.route('/api_openGoogleSpreadSheet', methods=['GET', 'POST'])
+def openGoogleSpreadSheet():
+    retDict = {"isSuccess": True, "data": GlobalSettings.GOOGLE_SPREADSHEET_URL}
+    return retDict
+
 @app.route('/api_importDataFromGoogleSpread', methods=['GET', 'POST'])
 def importDataFromGoogleSpread():
     # if 'ImportDataFromGoogleSpread' in flask.request.form:

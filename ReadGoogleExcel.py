@@ -156,7 +156,8 @@ def getSpreadSheetDataUniteDates():
     spreadSheetData = querySpreadSheetData()
     dateSets = set()
     for row in spreadSheetData[1:]:
-        dateSets.add(row[2])
+        if len(row) != 0:
+            dateSets.add(row[2])
     return sorted(dateSets, key=lambda d: tuple(map(int, d.replace('-', '/').split('/'))))
 
 def CreateSheet():

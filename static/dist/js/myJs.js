@@ -68,6 +68,29 @@ $(function() {
 //                this.remove()
 //        })
     });
+
+    $( "#openGoogleSpreadSheet" ).on( "click", function() {
+        $.ajax({
+                url:"api_openGoogleSpreadSheet",
+                type:"post",
+                dataType: 'json',
+                processData:false,
+                contentType:false,
+                success:function(data){
+                   if (data.isSuccess == true){
+                       window.open(data.data, '_blank').focus();
+                   }else{
+                       alert("error");
+                   }
+                }
+                ,
+                error:function(e){
+                        alert("error", e);
+                }
+        })
+
+    });
+
    $( "#importDataFromGoogleSpread" ).on( "click", function() {
         $("#OrderTable").remove()
         var form= new FormData(document.getElementById("queryForm"));
@@ -190,6 +213,8 @@ $( "#btnAddNewOrder" ).on( "click", function(){
                    $("#mPhone-input").val("")
                    $("#numbers-input").val("")
                    $("#userComment-input").val("")
+                   // clear input textarea
+                   $("#orderForm > div > div:nth-child(1) > textarea").val("")
                    radiobtn = document.getElementById("arriveTimeOnMorning-input");
                    radiobtn.checked = true;
                    radiobtn = document.getElementById("transfer-input");
