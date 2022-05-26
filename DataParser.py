@@ -40,6 +40,9 @@ class ParserBase():
     def getPaymentMethod(self):
         raise NotImplementedError
 
+    def getGoogleComment(self):
+        raise ""
+
     def getUserComment(self):
         return ""
 
@@ -56,6 +59,7 @@ class ParserBase():
         dp.numbers = self.getNumbers()
         dp.userComment = self.getUserComment()
         dp.paymentMethod = self.getPaymentMethod()
+        dp.googleComment = self.getGoogleComment()
         return dp
 
 import re
@@ -273,3 +277,11 @@ class HtmlFormDataParser(ParserBase):
 
     def getUserComment(self):
         return self.dt['userComment-input']
+
+    def getGoogleComment(self):
+        owner = self.dt['OrderSource-input']
+        paymentStatus = self.dt['paymentStatus-input'] if self.dt['paymentStatus-input'] == '已付' else ""
+        otherComments = self.dt['GoogleSheetComment-input']
+        if len(paymentStatus) > 0:
+            return "({}) {} {}".format(owner, paymentStatus, otherComments)
+        return "({}) {}".format(owner, otherComments)

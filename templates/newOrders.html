@@ -27,11 +27,11 @@
         <br>
 
          <div class="row">
-             <div class="col-sm">
+             <div class="col-sm-4">
                 <label>姓名</label>
                 <input type="text" class="form-control" id="name-input" name="name-input">
             </div>
-               <div class="col-sm">
+               <div class="col-sm-8">
                 <label>地址</label>
                 <input type="text" class="form-control" id="address-input" name="address-input">
             </div>
@@ -82,7 +82,35 @@
             <br>
             <label>其他需求</label>
             <input type="text" class="form-control" id="userComment-input" name="userComment-input">
-         <br>
+            <br>
+            <label>Google表單備註</label>
+            <input type="text" class="form-control" id="GoogleSheetComment-input" name="GoogleSheetComment-input">
+            <div class="row">
+             <div class="col-sm">
+                <label>訂單來源</label>
+                <br>
+                 <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="OrderSource-input" id="soup-input" value="湯" checked>
+                  <label class="form-check-label" for="soup-input">湯</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="OrderSource-input" id="fang-input" value="方" >
+                  <label class="form-check-label" for="fang-input">方</label>
+                </div>
+             </div>
+                <div class="col-sm">
+                <label>付款狀態</label>
+                <br>
+                 <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="paymentStatus-input" id="notPaid-input" value="未付" checked>
+                  <label class="form-check-label" for="notPaid-input">未付</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="paymentStatus-input" id="paid-input" value="已付" >
+                  <label class="form-check-label" for="paid-input">已付</label>
+                </div>
+             </div>
+            </div>
         </div>
     </div>
      <div class="row">

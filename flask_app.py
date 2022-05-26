@@ -54,22 +54,25 @@ def importDataFromGoogleSpread():
     import datetime
     arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y/%m/%d")
     strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
+    totoalNumbers = 0
+    totoalNumbersOfPack = 0
+    totoalNumbersOf2 = 0
     for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
         parser.setData(row)
         dataPack = parser.parse()
         # TODO : remove global varable Controls
         Controls.addNewOrderData(dataPack)
+        totoalNumbers += int(dataPack.numbers)
+        totoalNumbersOfPack += int(dataPack.numbersOfPack)
+        if int(dataPack.numbers) == 2:
+            totoalNumbersOf2 += 1
 
-    retDict = {"isSuccess": True, "data": Controls.getOrderData()}
+    retDict = {"isSuccess": True,
+               "data": Controls.getOrderData(),
+               "totoalNumbers": "總箱數：{}".format(totoalNumbers),
+               "totoalNumbersOfPack": "總件數：{}".format(totoalNumbersOfPack),
+               "totoalNumbersOf2": "兩箱件數：{}".format(totoalNumbersOf2)}
     return retDict
-
-    parser = DataParser.HtmlFormDataParser()
-    parser.setData(flask.request.form)
-    dataPack = parser.parse()
-    isSuccess = AddSpreadSheetData(dataPack.toGoogleSpreadSheetFormat())
-    if isSuccess:
-        return jsonify({"isSuccess": True, "msg": "上傳成功"})
-    return jsonify({"isSuccess": False, "msg": "上傳失敗"})
 
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():

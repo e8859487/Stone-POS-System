@@ -36,6 +36,7 @@ class DataPack(object):
         self.numbers = '0'  # TODO: adjust value according to numbersOfPack
         self.paymentMethod = PAYMENTMETHOD_TRANSFER  # 轉帳 1 / 貨到付款 2
         self.userComment = ''
+        self.googleComment = ''
 
     @property
     def arrivalTimeFormat(self):
@@ -132,8 +133,8 @@ class DataPack(object):
                  self.mPhone,
                  self.numbers,
                  self.paymentMethodFormat,
+                 self.googleComment,
                  self.userComment,
-                 "",
                  self.numbers,
                  self.shippingDate,
                  ]]
