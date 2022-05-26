@@ -78,7 +78,8 @@ $(function() {
                 contentType:false,
                 success:function(data){
                    if (data.isSuccess == true){
-                       window.open(data.data, '_blank').focus();
+                   var windowReference = window.open();
+                       windowReference.location = data.data;
                    }else{
                        alert("error");
                    }
