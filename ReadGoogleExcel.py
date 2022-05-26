@@ -136,7 +136,7 @@ def querySpreadSheetData():
     values_input = list()
     # Call the Sheets API
     sheet = service.spreadsheets()
-    for sheetRange in (SHEET_RESPONSE_RANGE, AUTO_FILL_TABLE_NAME):
+    for sheetRange in (AUTO_FILL_TABLE_NAME,):
         result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
                                       range=sheetRange).execute()
         if len(values_input) == 0:

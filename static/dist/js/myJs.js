@@ -211,7 +211,7 @@ $( "#btnAddNewOrder" ).on( "click", function(){
                    $("#address-input").val("")
                    $("#phone-input").val("")
                    $("#mPhone-input").val("")
-                   $("#numbers-input").val("")
+                   $("#numbers-input").val("4")
                    $("#userComment-input").val("")
                    // clear input textarea
                    $("#orderForm > div > div:nth-child(1) > textarea").val("")
