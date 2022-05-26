@@ -41,7 +41,7 @@ class ParserBase():
         raise NotImplementedError
 
     def getGoogleComment(self):
-        raise ""
+        return ""
 
     def getUserComment(self):
         return ""
