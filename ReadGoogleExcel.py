@@ -96,7 +96,20 @@ def initService():
     import google.oauth2.credentials
     global values_input, service
     if service is not None:
-        return True
+        try:
+            # test if the token is work or not
+            sheet = service.spreadsheets()
+            result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
+                                              range=AUTO_FILL_TABLE_NAME).execute()
+            return True
+        except:
+            service = None
+            if os.path.exists('token.pickle'):
+                os.remove('token.pickle')
+            return False
+
+        #return True
+
     # if 'credentials' not in flask.session:
     #     return False
     if GoogleMgr.credientials is None:
@@ -126,7 +139,6 @@ def initService():
     # flask.session['credentials'] = credentials_to_dict(creds)
     CreateSheet()
     return True
-
 
 def querySpreadSheetData():
     global service
