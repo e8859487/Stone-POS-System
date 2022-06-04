@@ -37,13 +37,13 @@ $(function() {
     }
 
     $( "#exportCSV" ).on( "click", function() {
-        var now = new Date();
-        var day = ("0" + now.getDate()).slice(-2);
-        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var inputDate = new Date($('#GoogleSpreadShippingDate-input > input').val());
+        var day = ("0" + inputDate.getDate()).slice(-2);
+        var month = ("0" + (inputDate.getMonth() + 1)).slice(-2);
 //        var hour = ("0" + (now.getHours() + 1)).slice(-2);
 //        var minute = ("0" + (now.getMinutes() + 1)).slice(-2);
-        var time = now.get
-        var today = now.getFullYear()+(month)+(day);//+(hour)+(minute);
+        var time = inputDate.get
+        var today = (month)+(day);//+(hour)+(minute);
         let options = {
         "separator": ",",
         "newline": "\n",
@@ -51,7 +51,7 @@ $(function() {
         "excludeColumns": "",
         "excludeRows": "",
         "trimContent": true,
-        "filename": today + "葡萄訂單.csv",
+        "filename": today + "出貨葡萄訂單.csv",
         "appendTo": "#output"
         }
         showFixContentColumns()
@@ -92,36 +92,45 @@ $(function() {
 
     });
 
+   function queryGoogleSpreadData(){
+       $("#OrderTable").remove()
+            var form= new FormData(document.getElementById("queryForm"));
+            $.ajax({
+                    url:"api_importDataFromGoogleSpread",
+                    type:"post",
+                    data:form,
+                    dataType: 'json',
+                    processData:false,
+                    contentType:false,
+                    success:function(data){
+                       if (data.isSuccess == true){
+                            $("#queryResponse").append(data.data)
+                                console.log(data.totoalNumbers );
+
+                            $("#totoalNumbers").html(data.totoalNumbers)
+                            //$("#totoalNumbersOf2").html(data.totoalNumbersOf2)
+                            //$("#totoalNumbersOfPack").html(data.totoalNumbersOfPack)
+                       }else{
+                           alert("error");
+                       }
+                       hideFixContentColumns()
+
+                    }
+                    ,
+                    error:function(e){
+                            alert("error", e);
+                    }
+            })
+
+       };
+
+     $( "#GoogleSpreadShippingDate-input > input" ).change(  function(){
+        queryGoogleSpreadData()
+     });
+
    $( "#importDataFromGoogleSpread" ).on( "click", function() {
-        $("#OrderTable").remove()
-        var form= new FormData(document.getElementById("queryForm"));
-        $.ajax({
-                url:"api_importDataFromGoogleSpread",
-                type:"post",
-                data:form,
-                dataType: 'json',
-                processData:false,
-                contentType:false,
-                success:function(data){
-                   if (data.isSuccess == true){
-                        $("#queryResponse").append(data.data)
-                            console.log(data.totoalNumbers );
-
-                        $("#totoalNumbers").html(data.totoalNumbers)
-                        $("#totoalNumbersOf2").html(data.totoalNumbersOf2)
-                        $("#totoalNumbersOfPack").html(data.totoalNumbersOfPack)
-                   }else{
-                       alert("error");
-                   }
-                   hideFixContentColumns()
-
-                }
-                ,
-                error:function(e){
-                        alert("error", e);
-                }
-        })});
-
+        queryGoogleSpreadData()
+    });
 
  $( "#btnPreviewData" ).on( "click", function(){
         var form= new FormData(document.getElementById("orderForm"));
@@ -244,7 +253,7 @@ $( "#btnAddNewOrder" ).on( "click", function(){
             var month = ("0" + (f.getMonth() + 1)).slice(-2);
             var tomorrow = f.getFullYear()+"-"+(month)+"-"+(day) ;
             $('#arrivalDate-input').val(tomorrow);
-            $('#GoogleSpreadArrivalDate-input').val(tomorrow);
+            $('#GoogleSpreadShippingDate-input').val(tomorrow);
         }
     }
     $("#shippingDate-input").on("input", updateArrivalDate);

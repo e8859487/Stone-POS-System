@@ -42,22 +42,23 @@ def openGoogleSpreadSheet():
 @app.route('/api_importDataFromGoogleSpread', methods=['GET', 'POST'])
 def importDataFromGoogleSpread():
     # if 'ImportDataFromGoogleSpread' in flask.request.form:
-    arrivalDate = str(flask.request.form['GoogleSpreadArrivalDate-input'])
-    if arrivalDate == "":
+    shippingDate = str(flask.request.form['GoogleSpreadShippingDate-input'])
+    if shippingDate == "":
         return jsonify({"isSuccess": False, "msg": "請選擇日期！"})
-    arrivalDate = arrivalDate.split(' ')[0]
+    shippingDate = shippingDate.split(' ')[0]
     Controls.clearOrderData()
     rawDatas = getSpreadSheetData()
     from DataParser import GoogleSpreadDataParser
     parser = GoogleSpreadDataParser()
 
     import datetime
-    arrivalDate = datetime.datetime.strptime(arrivalDate, "%Y/%m/%d")
-    strArrivalDate = "{}/{}/{}".format(arrivalDate.year, arrivalDate.month, arrivalDate.day)
+    shippingDate = datetime.datetime.strptime(shippingDate, "%Y/%m/%d")
+    strShippingDate = "{}/{}/{}".format(shippingDate.year, shippingDate.month, shippingDate.day)
     totoalNumbers = 0
     totoalNumbersOfPack = 0
     totoalNumbersOf2 = 0
-    for row in rawDatas[rawDatas['到貨日期'] == strArrivalDate][GoogleSpreadDataParser.interestColumn].iterrows():
+    totoalNumbersOf2_name = ["&nbsp&nbsp-"]
+    for row in rawDatas[rawDatas['出貨日期'] == strShippingDate][GoogleSpreadDataParser.interestColumn].iterrows():
         parser.setData(row)
         dataPack = parser.parse()
         # TODO : remove global varable Controls
@@ -66,10 +67,24 @@ def importDataFromGoogleSpread():
         totoalNumbersOfPack += int(dataPack.numbersOfPack)
         if int(dataPack.numbers) == 2:
             totoalNumbersOf2 += 1
+            totoalNumbersOf2_name.append(dataPack.name)
+            totoalNumbersOf2_name.append(",&nbsp")
+
+        if len(totoalNumbersOf2_name) > 1:
+            totoalNumbersOf2_nameStr = ''.join(totoalNumbersOf2_name[:-1])
+        else:
+            totoalNumbersOf2_nameStr = ''
 
     retDict = {"isSuccess": True,
                "data": Controls.getOrderData(),
-               "totoalNumbers": "總箱數：{}".format(totoalNumbers),
+               "totoalNumbers": "{} 出貨總整理：<br>"
+                          "總件數:{}&nbsp總箱數：{}<br>"
+                          "兩箱件數：{} <br>"
+                          "{}<br>".format(strShippingDate[5:],
+                                                    totoalNumbersOfPack, totoalNumbers,
+                                                    totoalNumbersOf2, totoalNumbersOf2_nameStr
+                                                    ),
+               # "totoalNumbers": "總箱數：{}".format(totoalNumbers),
                "totoalNumbersOfPack": "總件數：{}".format(totoalNumbersOfPack),
                "totoalNumbersOf2": "兩箱件數：{}".format(totoalNumbersOf2)}
     return retDict

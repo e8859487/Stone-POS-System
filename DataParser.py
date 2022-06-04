@@ -193,7 +193,7 @@ class ReDataParser(ParserBase):
         return ARRIVALTIME_AFTERNOON if len(group) > 0 else ARRIVALTIME_MORNING
 
 class GoogleSpreadDataParser(ParserBase):
-    interestColumn = ['收件人', '到貨日期', '指定到貨時段', '住址', '聯絡電話 (04-88xxxxxx)', '手機 (09xx-xxx-xxx)', '數量', "付款方式", "備註"]
+    interestColumn = ['收件人', '到貨日期', '指定到貨時段', '住址', '聯絡電話 (04-88xxxxxx)', '手機 (09xx-xxx-xxx)', '數量', "付款方式", "備註", '出貨日期']
     def getName(self):
         return self.dt[1][0]
 

@@ -169,7 +169,7 @@ def getSpreadSheetDataUniteDates():
     dateSets = set()
     for row in spreadSheetData[1:]:
         if len(row) != 0:
-            dateSets.add(row[2].replace('-', '/'))
+            dateSets.add(row[12].replace('-', '/'))
 
     return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
 
