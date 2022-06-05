@@ -280,7 +280,7 @@ class HtmlFormDataParser(ParserBase):
 
     def getGoogleComment(self):
         owner = self.dt['OrderSource-input']
-        paymentStatus = self.dt['paymentStatus-input'] if self.dt['paymentStatus-input'] == '已付' else ""
+        paymentStatus = self.dt['paymentStatus-input'] if self.dt['paymentStatus-input'] == '已收款' else ""
         otherComments = self.dt['GoogleSheetComment-input']
         if len(paymentStatus) > 0:
             return "({}) {} {}".format(owner, paymentStatus, otherComments)

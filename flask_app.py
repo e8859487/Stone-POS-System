@@ -65,9 +65,13 @@ def importDataFromGoogleSpread():
         Controls.addNewOrderData(dataPack)
         totoalNumbers += int(dataPack.numbers)
         totoalNumbersOfPack += int(dataPack.numbersOfPack)
-        if int(dataPack.numbers) == 2:
+        if int(dataPack.numbers) % 4 != 0:
             totoalNumbersOf2 += 1
-            totoalNumbersOf2_name.append(dataPack.name)
+            if (int(dataPack.numbers) % 4 == 2):
+                totoalNumbersOf2_name.append(dataPack.name)
+            else:
+                totoalNumbersOf2_name.append("{}({}箱)".format(dataPack.name, int(dataPack.numbers) % 4))
+
             totoalNumbersOf2_name.append(",&nbsp")
 
         if len(totoalNumbersOf2_name) > 1:
@@ -77,16 +81,14 @@ def importDataFromGoogleSpread():
 
     retDict = {"isSuccess": True,
                "data": Controls.getOrderData(),
-               "totoalNumbers": "{} 出貨總整理：<br>"
-                          "總件數:{}&nbsp總箱數：{}<br>"
+               "totoalNumbers": "==&nbsp{} 出貨總整理&nbsp==<br>"
+                          "總件數:{}&nbsp&nbsp總箱數：{}<br>"
                           "兩箱件數：{} <br>"
                           "{}<br>".format(strShippingDate[5:],
                                                     totoalNumbersOfPack, totoalNumbers,
                                                     totoalNumbersOf2, totoalNumbersOf2_nameStr
                                                     ),
-               # "totoalNumbers": "總箱數：{}".format(totoalNumbers),
-               "totoalNumbersOfPack": "總件數：{}".format(totoalNumbersOfPack),
-               "totoalNumbersOf2": "兩箱件數：{}".format(totoalNumbersOf2)}
+               }
     return retDict
 
 @app.route('/show_orders', methods=['GET', 'POST'])
