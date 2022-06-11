@@ -105,8 +105,6 @@ $(function() {
                     success:function(data){
                        if (data.isSuccess == true){
                             $("#queryResponse").append(data.data)
-                                console.log(data.totoalNumbers );
-
                             $("#totoalNumbers").html(data.totoalNumbers)
                             //$("#totoalNumbersOf2").html(data.totoalNumbersOf2)
                             //$("#totoalNumbersOfPack").html(data.totoalNumbersOfPack)

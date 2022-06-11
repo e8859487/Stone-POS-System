@@ -231,9 +231,11 @@ class GoogleSpreadDataParser(ParserBase):
         return PAYMENTMETHOD_TRANSFER
 
     def getUserComment(self):
-        if self.dt[1][8]:
-            return self.dt[1][8]
-        return ""
+        userComment = self.dt[1][8]
+        if (int(self.getNumbers()) % 4 != 0):
+            return userComment + "  ██ 寄件備註 ：共 {} 件， {} 箱 ██".format(self.getNumbersOfPack(), self.getNumbers())
+
+        return userComment
 
 class HtmlFormDataParser(ParserBase):
     def getName(self):
