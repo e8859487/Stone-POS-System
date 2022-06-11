@@ -97,13 +97,13 @@ def initService():
     global values_input, service
     if service is not None:
         try:
-            creds = google.oauth2.credentials.Credentials(
-                **GoogleMgr.credientials)
-            service = build('sheets', 'v4', credentials=creds)
-            if not creds or not creds.valid:
-                if creds and creds.expired and creds.refresh_token:
-                    creds.refresh(Request())
-            # test if the token is work or not
+            # creds = google.oauth2.credentials.Credentials(
+            #     **GoogleMgr.credientials)
+            # service = build('sheets', 'v4', credentials=creds)
+            # if not creds.valid:
+            #     if creds and creds.expired and creds.refresh_token:
+            #         creds.refresh(Request())
+            # # test if the token is work or not
             # sheet = service.spreadsheets()
             # result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
             #                                   range=AUTO_FILL_TABLE_NAME).execute()
