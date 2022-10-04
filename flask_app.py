@@ -116,6 +116,13 @@ def new_orders():
 def Others():
     return render_template('index.html', table=print_sample(), NavIndex=3)
 
+
+@app.route('/photoGallery')
+def photoGallery():
+    return render_template('photoGallery.html')
+
+
+
 def print_sample():
     return (('【姓名】<br>'+
             '【聯繫電話】<br>'+
