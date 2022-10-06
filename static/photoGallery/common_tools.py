@@ -1,5 +1,5 @@
 import pickle
-
+import pathlib
 lastLoad = 0
 def saveToPickle(data):
     with open('photoPath.pickle', 'wb') as f:
@@ -10,7 +10,7 @@ def loadFromPickle():
     global ret
     if ret is not None:
         return ret
-
-    with open('static/photoGallery/photoPath.pickle', 'rb') as f:
+    (__file__).split('/')
+    with open(pathlib.Path(__file__).parent.as_posix() + '/photoPath.pickle', 'rb') as f:
         ret = pickle.load(f)
     return ret
