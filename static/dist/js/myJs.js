@@ -89,7 +89,6 @@ $(function() {
                         alert("error", e);
                 }
         })
-
     });
 
    function queryGoogleSpreadData(){

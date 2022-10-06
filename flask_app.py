@@ -4,6 +4,8 @@ import Controls
 from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService, GoogleMgr, \
     getSpreadSheetDataUniteDates
 import GlobalSettings
+import static.photoGallery.common_tools as tools
+
 
 app = Flask(__name__)
 # Note: A secret key is included in the sample so that it works.
@@ -117,9 +119,20 @@ def Others():
     return render_template('index.html', table=print_sample(), NavIndex=3)
 
 
+
+# ==========================================
 @app.route('/photoGallery')
 def photoGallery():
-    return render_template('photoGallery.html')
+    return render_template('photoGallery2.html')
+
+@app.route('/api_loadMorePhoto', methods=['GET', 'POST'])
+def loadMorePhoto():
+    lastIndex = int(flask.request.form['loadIndex'])
+    photos = tools.loadFromPickle()[lastIndex:lastIndex + 8]
+    retDict = {"isSuccess": True, "data": photos}
+    return retDict
+
+# ==========================================
 
 
 

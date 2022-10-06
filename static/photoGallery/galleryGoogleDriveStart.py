@@ -3,6 +3,7 @@ from __future__ import print_function
 import os.path
 
 import io
+import common_tools
 
 from googleapiclient.http import MediaIoBaseDownload
 from google.auth.transport.requests import Request
@@ -51,9 +52,9 @@ def main():
                                                 fields='nextPageToken, '
                                                        'files(id, name, webContentLink)',
                                                 pageToken=page_token).execute()
-                for file in response.get('files', []):
+                # for file in response.get('files', []):
                     # Process change
-                    print(F'Found file: {file.get("name")}, {file.get("id")}, {file.get("webContentLink")}')
+                    # print(F'Found file: {file.get("name")}, {file.get("id")}, {file.get("webContentLink")}')
                 files.extend(response.get('files', []))
                 page_token = response.get('nextPageToken', None)
                 if page_token is None:
@@ -118,8 +119,17 @@ def main():
         return file.getvalue()
 
     # queryID()
-    fileId = search_file()
-    download_file(fileId[0]['id'])
+    files = search_file()
+    for item in files:
+        print(F"fileName:{item['name']}, fileName:{item['webContentLink']}")
+
+    common_tools.saveToPickle(files)
+
+    print(" ======== ")
+    loadPhotos = common_tools.loadFromPickle()
+    for item in loadPhotos:
+        print(F"fileName:{item['name']}, fileName:{item['webContentLink']}")
+    #download_file(fileId[0]['id'])
 
 
 if __name__ == '__main__':

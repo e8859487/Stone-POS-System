@@ -139,3 +139,31 @@ footer{
 footer a,footer a:hover{
     color: #88C425;
 }
+
+
+
+// new design
+.demo {
+    width:450px;
+}
+ul {
+    list-style: none outside none;
+    padding-left: 0;
+    margin-bottom:0;
+}
+li {
+    display: block;
+    float: left;
+    margin-right: 6px;
+    cursor:pointer;
+}
+img {
+
+
+    	height: 100%;
+	width: 100%;
+	object-fit:scale-down;
+	-o-object-fit:cover;
+
+}
+
