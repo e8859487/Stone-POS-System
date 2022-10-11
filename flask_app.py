@@ -128,7 +128,9 @@ def photoGallery():
 @app.route('/api_loadMorePhoto', methods=['GET', 'POST'])
 def loadMorePhoto():
     lastIndex = int(flask.request.form['loadIndex'])
-    photos = tools.loadFromPickle()[lastIndex:lastIndex + 8]
+    itemCount = int(flask.request.form['itemCount'])
+    print ("lastIndex: " + str(lastIndex))
+    photos = tools.loadFromPickle()[lastIndex:lastIndex + itemCount]
     retDict = {"isSuccess": True, "data": photos}
     return retDict
 

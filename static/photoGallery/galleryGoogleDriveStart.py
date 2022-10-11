@@ -48,7 +48,7 @@ def main():
             page_token = None
             while True:
                 # pylint: disable=maybe-no-member
-                response = service.files().list(q="mimeType='image/jpeg' and '1YRYqbvWqTy1CRDnvS2CtuLqpEDD6uPh_' in parents",
+                response = service.files().list(q="mimeType='image/webp' and '1YRYqbvWqTy1CRDnvS2CtuLqpEDD6uPh_' in parents",
                                                 spaces='drive',
                                                 fields='nextPageToken, '
                                                        'files(id, name, webContentLink)',
@@ -126,10 +126,10 @@ def main():
 
     common_tools.saveToPickle(files)
 
-    print(" ======== ")
-    loadPhotos = common_tools.loadFromPickle()
-    for item in loadPhotos:
-        print(F"fileName:{item['name']}, fileName:{item['webContentLink']}")
+    # print(" ======== ")
+    # loadPhotos = common_tools.loadFromPickle()
+    # for item in loadPhotos:
+    #     print(F"fileName:{item['name']}, fileName:{item['webContentLink']}")
     #download_file(fileId[0]['id'])
 
 

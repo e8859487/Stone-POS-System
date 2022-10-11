@@ -4,35 +4,35 @@ $(function() {
 
     $('#swipeboxExample').justifiedGallery({
         lastRow : 'nojustify',
-        rowHeight : 100,
+        rowHeight : 400,
         rel : 'gallery2',
         margins : 1
     }).on('jg.complete', function () {
         $('.swipeboxExampleImg').swipebox();
     });
+
     var outerdt
     var loadIndex = 0
-    $(window).scroll(function() {
+    var queryCount = 4
+    function loadMorePhoto(count){
         var form_data = new FormData();
-        form_data.append('loadIndex', 0);
-        $.ajax({
-            url:"api_loadMorePhoto",
-            type:"post",
-            data:form_data,
-            dataType: 'json',
-            processData:false,
-            contentType:false,
-            success:function(data){
-                outerdt = data
-               if (data.isSuccess == true){
-                   loadIndex = loadIndex + 8
-                   console.log( "api_loadMorePhoto success!" );
-                    console.log( $(window).scrollTop() + " " + $(window).height() + " " +  $(document).height());
-                   if($(window).scrollTop() + $(window).height() == $(document).height()) {
-                        console.log( "api_loadMorePhoto success2!" );
-                        for (var i = 0; i < 5; i++) {
-                            //console.log( "api_loadMorePhoto!!" + data.data['webContentLink']  );
-
+                form_data.append('loadIndex', loadIndex);
+                form_data.append('itemCount', count);
+               console.log( "api_loadMorePhoto!!" );
+                $.ajax({
+                url:"api_loadMorePhoto",
+                type:"post",
+                data:form_data,
+                dataType: 'json',
+                processData:false,
+                contentType:false,
+                success:function(data){
+                    outerdt = data
+                   if (data.isSuccess == true){
+                       //console.log( "api_loadMorePhoto success!" );
+                        loadIndex = loadIndex + count
+                        console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
+                        for (var i = 0; i < data.data.length; i++) {
                             $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
                             'href="'+ data.data[i]['webContentLink'] + '"' + '>' +
                             '<img '+
@@ -42,15 +42,23 @@ $(function() {
                             '</a>');
                         }
                         $('#swipeboxExample').justifiedGallery('norewind');
-                  }
-               }else{
-                   //alert("error");
-               }
-            },
-            error:function(e){
-                //alert("error", e);
-            }
-        })
+                   }else{
+                       //alert("error");
+                   }
+                },
+                error:function(e){
+                    //alert("error", e);
+                }
+            })
+
+    }
+
+    loadMorePhoto(8)
+
+    $(window).scroll(function() {
+       if(Math.round($(window).scrollTop()) + $(window).height() >= $(document).height()) {
+           loadMorePhoto(4)
+        }
     });
 
 //    var images = [
