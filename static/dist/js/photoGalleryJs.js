@@ -11,45 +11,46 @@ $(function() {
         $('.swipeboxExampleImg').swipebox();
     });
 
-    var outerdt
     var loadIndex = 0
+    var lastLoadIdx = -1
     var queryCount = 4
     function loadMorePhoto(count){
         var form_data = new FormData();
-                form_data.append('loadIndex', loadIndex);
-                form_data.append('itemCount', count);
-               console.log( "api_loadMorePhoto!!" );
-                $.ajax({
-                url:"api_loadMorePhoto",
-                type:"post",
-                data:form_data,
-                dataType: 'json',
-                processData:false,
-                contentType:false,
-                success:function(data){
-                    outerdt = data
-                   if (data.isSuccess == true){
-                       //console.log( "api_loadMorePhoto success!" );
-                        loadIndex = loadIndex + count
-                        console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
-                        for (var i = 0; i < data.data.length; i++) {
-                            $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
-                            'href="'+ data.data[i]['webContentLink'] + '"' + '>' +
-                            '<img '+
-                            'src="' + data.data[i]['webContentLink'] + '"' +
-                            'alt="' + data.data[i]['name'] + '"' +
-                            '/>' +
-                            '</a>');
-                        }
-                        $('#swipeboxExample').justifiedGallery('norewind');
-                   }else{
-                       //alert("error");
-                   }
-                },
-                error:function(e){
-                    //alert("error", e);
+        form_data.append('loadIndex', loadIndex);
+        form_data.append('itemCount', count);
+        console.log( "api_loadMorePhoto!!" );
+        if (lastLoadIdx == loadIndex) return
+        lastLoadIdx = loadIndex
+        $.ajax({
+        url:"api_loadMorePhoto",
+        type:"post",
+        data:form_data,
+        dataType: 'json',
+        processData:false,
+        contentType:false,
+        success:function(data){
+            if (data.isSuccess == true){
+               //console.log( "api_loadMorePhoto success!" );
+                loadIndex = loadIndex + count
+                console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
+                for (var i = 0; i < data.data.length; i++) {
+                    $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
+                    'href="'+ data.data[i]['webContentLink'] + '"' + '>' +
+                    '<img '+
+                    'src="' + data.data[i]['webContentLink'] + '"' +
+                    'alt="' + data.data[i]['name'] + '"' +
+                    '/>' +
+                    '</a>');
                 }
-            })
+                $('#swipeboxExample').justifiedGallery('norewind');
+           }else{
+               //alert("error");
+           }
+        },
+        error:function(e){
+            //alert("error", e);
+        }
+    })
 
     }
 
