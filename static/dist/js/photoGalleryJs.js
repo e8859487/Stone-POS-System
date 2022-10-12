@@ -9,18 +9,18 @@ $(function() {
         margins : 1
     }).on('jg.complete', function () {
         $('.swipeboxExampleImg').swipebox({
-            nextSlide:function(idx){
-                if (idx == $('.swipeboxExampleImg').length - 1 ){
-                    console.log("load more photo" + idx)
-                    loadMorePhoto(4, function(){
-                        console.log("loadComplete")
-                        $.swipebox.plugin().init()
-
-
-                    })
-                }
-                console.log("nextslide" + idx)
-            }
+//            nextSlide:function(idx){
+//                if (idx == $('.swipeboxExampleImg').length - 1 ){
+//                    console.log("load more photo" + idx)
+//                    loadMorePhoto(4, function(){
+//                        console.log("loadComplete")
+//                        $.swipebox.plugin().init()
+//
+//
+//                    })
+//                }
+//                console.log("nextslide" + idx)
+//            }
         });
     });
 
