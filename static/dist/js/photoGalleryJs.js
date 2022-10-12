@@ -27,7 +27,7 @@ $(function() {
     var loadIndex = 0
     var lastLoadIdx = -1
     var queryCount = 4
-    function loadMorePhoto(count, onLoadComplete=null){
+    function loadMorePhoto(count){
         var form_data = new FormData();
         form_data.append('loadIndex', loadIndex);
         form_data.append('itemCount', count);
@@ -57,9 +57,9 @@ $(function() {
                 }
                 $('#swipeboxExample').justifiedGallery('norewind');
 
-                if (onLoadComplete != null){
-                    onLoadComplete()
-                }
+//                if (onLoadComplete != null){
+//                    onLoadComplete()
+//                }
            }else{
                //alert("error");
            }
@@ -74,7 +74,7 @@ $(function() {
     loadMorePhoto(8)
 
     $(window).scroll(function() {
-       if(Math.round($(window).scrollTop()) + $(window).height() + 200 >= $(document).height()) {
+       if(Math.round($(window).scrollTop()) + $(window).height()>= $(document).height()) {
            loadMorePhoto(4)
         }
     });
