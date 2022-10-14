@@ -35,47 +35,59 @@ $(function() {
         if (lastLoadIdx == loadIndex) return
         lastLoadIdx = loadIndex
         $.ajax({
-        url:"api_loadMorePhoto",
-        type:"post",
-        data:form_data,
-        dataType: 'json',
-        processData:false,
-        contentType:false,
-        success:function(data){
-            if (data.isSuccess == true){
-               //console.log( "api_loadMorePhoto success!" );
-                loadIndex = loadIndex + count
-                console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
-                for (var i = 0; i < data.data.length; i++) {
-                    $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
-                    'href="'+ data.data[i]['webContentLink'] + '"' + '>' +
-                    '<img '+
-                    'src="' + data.data[i]['webContentLink'] + '"' +
-                    'alt="' + data.data[i]['name'] + '"' +
-                    '/>' +
-                    '</a>');
-                }
-                $('#swipeboxExample').justifiedGallery('norewind');
+            url:"api_loadMorePhoto",
+            type:"post",
+            data:form_data,
+            dataType: 'json',
+            processData:false,
+            contentType:false,
+            success:function(data){
+                if (data.isSuccess == true){
+                   //console.log( "api_loadMorePhoto success!" );
+                    loadIndex = loadIndex + count
+                    console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
+                    var counter = Math.floor(Math.random() * 200)
+                    for (var i = 0; i < data.data.length; i++) {
+                        var wck = data.data[i]['webContentLink']
+                        var name = data.data[i]['name'];
 
-//                if (onLoadComplete != null){
-//                    onLoadComplete()
-//                }
-           }else{
-               //alert("error");
-           }
-        },
-        error:function(e){
-            //alert("error", e);
-        }
-    })
+                        (function(wck, name, counter){
+                            window.setTimeout(function() {
+                                console.log("load photo in : " + counter )
+                                //console.log("load photo in : " + name )
+                                 $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
+                                    'href="'+ wck + '"' + '>' +
+                                    '<img '+
+                                    'src="' + wck + '"' +
+                                    'alt="' + name + '"' +
+                                    '/>' +
+                                    '</a>');
+                                    $('#swipeboxExample').justifiedGallery('norewind');
+                                }, counter);
+                          })(wck, name, counter);
 
+                        counter = counter + Math.floor(Math.random() * 5000)
+                    }
+
+    //                if (onLoadComplete != null){
+    //                    onLoadComplete()
+    //                }
+               }else{
+                   //alert("error");
+               }
+            },
+            error:function(e){
+                //alert("error", e);
+            }
+        })
     }
 
-    loadMorePhoto(8)
+    loadMorePhoto(Math.floor(Math.random() * 4) + 5)
 
     $(window).scroll(function() {
-       if(Math.round($(window).scrollTop()) + $(window).height()>= $(document).height()) {
-           loadMorePhoto(4)
+       if(Math.round($(window).scrollTop()) + $(window).height() + 100 >= $(document).height()) {
+           // random load 4 ~ 7
+           loadMorePhoto(Math.floor(Math.random() * 4) + 2)
         }
     });
 
