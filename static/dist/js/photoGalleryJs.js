@@ -85,7 +85,7 @@ $(function() {
     loadMorePhoto(Math.floor(Math.random() * 4) + 5)
 
     $(window).scroll(function() {
-       if(Math.round($(window).scrollTop()) + $(window).height() + 100 >= $(document).height()) {
+       if(Math.round($(window).scrollTop()) + $(window).height() + 300 >= $(document).height()) {
            // random load 4 ~ 7
            loadMorePhoto(Math.floor(Math.random() * 4) + 2)
         }
