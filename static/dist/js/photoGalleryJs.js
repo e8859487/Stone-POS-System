@@ -24,6 +24,23 @@ $(function() {
         });
     });
 
+    function shuffle(){
+        $.ajax({
+                url:"api_shufflePhoto",
+                type:"post",
+                dataType: 'json',
+                processData:false,
+                contentType:false,
+                success:function(data){
+
+                }
+                ,
+                error:function(e){
+                }
+        })
+    }
+    shuffle()
+
     var loadIndex = 0
     var lastLoadIdx = -1
     var queryCount = 4
@@ -31,9 +48,11 @@ $(function() {
         var form_data = new FormData();
         form_data.append('loadIndex', loadIndex);
         form_data.append('itemCount', count);
-        console.log( "api_loadMorePhoto!!" );
+        //console.log( "api_loadMorePhoto!!" );
         if (lastLoadIdx == loadIndex) return
         lastLoadIdx = loadIndex
+        console.log("load photo : " + count )
+
         $.ajax({
             url:"api_loadMorePhoto",
             type:"post",
@@ -43,9 +62,9 @@ $(function() {
             contentType:false,
             success:function(data){
                 if (data.isSuccess == true){
-                   //console.log( "api_loadMorePhoto success!" );
+                   console.log( "api_loadMorePhoto success!" );
                     loadIndex = loadIndex + count
-                    console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
+                   // console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
                     var counter = Math.floor(Math.random() * 200)
                     for (var i = 0; i < data.data.length; i++) {
                         var wck = data.data[i]['webContentLink']
@@ -53,7 +72,7 @@ $(function() {
 
                         (function(wck, name, counter){
                             window.setTimeout(function() {
-                                console.log("load photo in : " + counter )
+                               // console.log("load photo in : " + counter )
                                 //console.log("load photo in : " + name )
                                  $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
                                     'href="'+ wck + '"' + '>' +
@@ -87,6 +106,7 @@ $(function() {
     $(window).scroll(function() {
        if(Math.round($(window).scrollTop()) + $(window).height() + 300 >= $(document).height()) {
            // random load 4 ~ 7
+
            loadMorePhoto(Math.floor(Math.random() * 4) + 2)
         }
     });

@@ -125,6 +125,14 @@ def Others():
 def photoGallery():
     return render_template('photoGallery2.html')
 
+photoList = tools.loadFromPickle()
+@app.route('/api_shufflePhoto', methods=['GET', 'POST'])
+def shufflePhoto():
+    import random
+    global photoList
+    random.shuffle(photoList)
+    return {"isSuccess": True,}
+
 @app.route('/api_loadMorePhoto', methods=['GET', 'POST'])
 def loadMorePhoto():
     lastIndex = int(flask.request.form['loadIndex'])
