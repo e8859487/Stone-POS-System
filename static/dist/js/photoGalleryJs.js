@@ -51,7 +51,7 @@ $(function() {
         //console.log( "api_loadMorePhoto!!" );
         if (lastLoadIdx == loadIndex) return
         lastLoadIdx = loadIndex
-        console.log("load photo : " + count )
+//        console.log("load photo : " + count )
 
         $.ajax({
             url:"api_loadMorePhoto",
@@ -62,7 +62,7 @@ $(function() {
             contentType:false,
             success:function(data){
                 if (data.isSuccess == true){
-                   console.log( "api_loadMorePhoto success!" );
+                   console.log( "api_loadMorePhoto success!" + data.data.length);
                     loadIndex = loadIndex + count
                    // console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
                     var counter = Math.floor(Math.random() * 200)
@@ -92,6 +92,8 @@ $(function() {
     //                    onLoadComplete()
     //                }
                }else{
+                   lastLoadIdx = -1
+
                    //alert("error");
                }
             },
@@ -104,8 +106,11 @@ $(function() {
     loadMorePhoto(Math.floor(Math.random() * 4) + 5)
 
     $(window).scroll(function() {
-       if(Math.round($(window).scrollTop()) + $(window).height() + 300 >= $(document).height()) {
+//        console.log("scrollTop: "+$(window).scrollTop() +"window height: " + $(window).height()+ "DOM height: " + $(document).height() )
+//        console.log("res: " + Math.round(($(window).scrollTop()) + $(window).height() + 400) + " "+ $(document).height() )
+       if((Math.round(($(window).scrollTop()) + $(window).height() + 400)) >= $(document).height()) {
            // random load 4 ~ 7
+//            console.log("res:do load" )
 
            loadMorePhoto(Math.floor(Math.random() * 4) + 2)
         }

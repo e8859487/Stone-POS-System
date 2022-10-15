@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask, render_template, jsonify
 import DataParser
 import Controls
@@ -133,8 +135,16 @@ def shufflePhoto():
     random.shuffle(photoList)
     return {"isSuccess": True,}
 
+lastTriggerTime = datetime.now()
 @app.route('/api_loadMorePhoto', methods=['GET', 'POST'])
 def loadMorePhoto():
+    # avoid duplicate loading
+    global lastTriggerTime
+    now = datetime.now()
+    if ((now - lastTriggerTime).seconds < 1):
+        return {"isSuccess": False, "data": []}
+    lastTriggerTime = now
+
     lastIndex = int(flask.request.form['loadIndex'])
     itemCount = int(flask.request.form['itemCount'])
     print ("lastIndex: " + str(lastIndex))
