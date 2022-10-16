@@ -4,9 +4,9 @@ $(function() {
 
     $('#swipeboxExample').justifiedGallery({
         lastRow : 'nojustify',
-        rowHeight : 400,
+        rowHeight : 450,
         rel : 'gallery2',
-        margins : 1
+        margins : 3
     }).on('jg.complete', function () {
         $('.swipeboxExampleImg').swipebox({
 //            nextSlide:function(idx){
@@ -65,7 +65,7 @@ $(function() {
                    console.log( "api_loadMorePhoto success!" + data.data.length);
                     loadIndex = loadIndex + count
                    // console.log( "api_loadMorePhoto success2! loadIndex: " + loadIndex );
-                    var counter = Math.floor(Math.random() * 200)
+                    var counter = Math.floor(Math.random() * 20)
                     for (var i = 0; i < data.data.length; i++) {
                         var wck = data.data[i]['webContentLink']
                         var name = data.data[i]['name'];
@@ -85,7 +85,7 @@ $(function() {
                                 }, counter);
                           })(wck, name, counter);
 
-                        counter = counter + Math.floor(Math.random() * 5000)
+                        counter = counter + Math.floor(Math.random() * 50)
                     }
 
     //                if (onLoadComplete != null){
