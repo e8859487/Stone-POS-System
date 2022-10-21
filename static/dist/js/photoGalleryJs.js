@@ -85,7 +85,7 @@ $(function() {
                                 }, counter);
                           })(wck, name, counter);
 
-                        counter = counter + Math.floor(Math.random() * 50)
+                        counter = counter + Math.floor(Math.random() * 5000)
                     }
 
     //                if (onLoadComplete != null){
@@ -108,30 +108,12 @@ $(function() {
     $(window).scroll(function() {
 //        console.log("scrollTop: "+$(window).scrollTop() +"window height: " + $(window).height()+ "DOM height: " + $(document).height() )
 //        console.log("res: " + Math.round(($(window).scrollTop()) + $(window).height() + 400) + " "+ $(document).height() )
-       if((Math.round(($(window).scrollTop()) + $(window).height() + 400)) >= $(document).height()) {
+       if((Math.round(($(window).scrollTop()) + $(window).height() + 500)) >= $(document).height()) {
            // random load 4 ~ 7
 //            console.log("res:do load" )
 
            loadMorePhoto(Math.floor(Math.random() * 4) + 2)
         }
     });
-
-//    var images = [
-//	{
-//		"url" : "https://sachinchoolur.github.io/lightslider/img/cS-1.jpg",
-//		"width" : 100,
-//		"height" : 200
-//	},
-//	{
-//		"url" : "https://sachinchoolur.github.io/lightslider/img/cS-2.jpg",
-//		"width" : 300,
-//		"height" : 400
-//	},
-//];
-
-//    $('#gallery').flexPhotoGallery({
-//	imageArray: images,
-//	isViewImageOnClick: true
-//});
 
 });
