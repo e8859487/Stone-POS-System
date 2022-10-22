@@ -103,7 +103,7 @@ $(function() {
         })
     }
 
-    loadMorePhoto(Math.floor(Math.random() * 4) + 5)
+    loadMorePhoto(Math.floor(Math.random() * 2) + 4)
 
     $(window).scroll(function() {
 //        console.log("scrollTop: "+$(window).scrollTop() +"window height: " + $(window).height()+ "DOM height: " + $(document).height() )
