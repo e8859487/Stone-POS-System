@@ -92,7 +92,7 @@ $(function() {
         })
     }
 
-    loadMorePhoto(Math.floor(Math.random() * 2) + 4)
+    loadMorePhoto(Math.floor(Math.random() * 6) + 4)
 
     $(window).scroll(function() {
 //        console.log("scrollTop: "+$(window).scrollTop() +"window height: " + $(window).height()+ "DOM height: " + $(document).height() )
@@ -101,7 +101,7 @@ $(function() {
            // random load 4 ~ 7
 //            console.log("res:do load" )
 
-           loadMorePhoto(Math.floor(Math.random() * 2) + 2)
+           loadMorePhoto(Math.floor(Math.random() * 6) + 2)
         }
     });
 });
