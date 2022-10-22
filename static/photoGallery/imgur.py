@@ -14,6 +14,8 @@ client = ImgurClient(GlobalSettings.client_id, GlobalSettings.client_secret, Glo
 # credentials = client.authorize('PIN OBTAINED FROM AUTHORIZATION', 'pin')
 # client.set_user_auth(credentials['access_token'], credentials['refresh_token'])
 
+def toHugeThumbnail(oriLink):
+    return oriLink.replace('.jpg', 'h.jpg')
 
 def getImages():
     imageMapList = []
@@ -22,7 +24,7 @@ def getImages():
         print("page : {}, total photos: image: {}".format(i, len(imageMapList)))
 
         for image in images:
-            imageMapList.append({'name': image.name, 'webContentLink': image.link})
+            imageMapList.append({'name': image.name, 'webContentLink': toHugeThumbnail(image.link)})
     print("total photos: image: {}".format(len(imageMapList)) )
     import common_tools
     common_tools.saveToPickle(imageMapList)
