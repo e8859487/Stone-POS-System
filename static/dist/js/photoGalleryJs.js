@@ -85,7 +85,7 @@ $(function() {
                                 }, counter);
                           })(wck, name, counter);
 
-                        counter = counter + Math.floor(Math.random() * 5000)
+                        counter = counter + Math.floor(Math.random() * 50)
                     }
 
     //                if (onLoadComplete != null){
@@ -112,7 +112,7 @@ $(function() {
            // random load 4 ~ 7
 //            console.log("res:do load" )
 
-           loadMorePhoto(Math.floor(Math.random() * 4) + 2)
+           loadMorePhoto(Math.floor(Math.random() * 2) + 2)
         }
     });
 
