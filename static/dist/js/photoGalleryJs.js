@@ -9,18 +9,6 @@ $(function() {
         margins : 3
     }).on('jg.complete', function () {
         $('.swipeboxExampleImg').swipebox({
-//            nextSlide:function(idx){
-//                if (idx == $('.swipeboxExampleImg').length - 1 ){
-//                    console.log("load more photo" + idx)
-//                    loadMorePhoto(4, function(){
-//                        console.log("loadComplete")
-//                        $.swipebox.plugin().init()
-//
-//
-//                    })
-//                }
-//                console.log("nextslide" + idx)
-//            }
         });
     });
 
@@ -40,6 +28,7 @@ $(function() {
         })
     }
     shuffle()
+    const loader = loadImageWithWorker;
 
     var loadIndex = 0
     var lastLoadIdx = -1
@@ -72,25 +61,25 @@ $(function() {
 
                         (function(wck, name, counter){
                             window.setTimeout(function() {
+                                    loader(wck).then(img => {
+                                        $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
+                                        'href="'+ wck + '"' + '>' +
+                                        '<img '+
+                                        'src="' + wck + '"' +
+                                        'alt="' + name + '"' +
+                                        '/>' +
+                                        '</a>');
+                                        $('#swipeboxExample').justifiedGallery('norewind');
+                                    }, counter);
+                                });
+
                                // console.log("load photo in : " + counter )
                                 //console.log("load photo in : " + name )
-                                 $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
-                                    'href="'+ wck + '"' + '>' +
-                                    '<img '+
-                                    'src="' + wck + '"' +
-                                    'alt="' + name + '"' +
-                                    '/>' +
-                                    '</a>');
-                                    $('#swipeboxExample').justifiedGallery('norewind');
-                                }, counter);
+
                           })(wck, name, counter);
 
                         counter = counter + Math.floor(Math.random() * 50)
                     }
-
-    //                if (onLoadComplete != null){
-    //                    onLoadComplete()
-    //                }
                }else{
                    lastLoadIdx = -1
 
@@ -115,5 +104,4 @@ $(function() {
            loadMorePhoto(Math.floor(Math.random() * 2) + 2)
         }
     });
-
 });
