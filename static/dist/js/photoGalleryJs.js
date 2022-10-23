@@ -28,7 +28,8 @@ $(function() {
         })
     }
     shuffle()
-    const loader = loadImageWithWorker;
+//    const loader = loadImageWithWorker;
+    const loader = loadImageWithImageTag;
 
     var loadIndex = 0
     var lastLoadIdx = -1
@@ -61,7 +62,7 @@ $(function() {
 
                         (function(wck, name, counter){
                             window.setTimeout(function() {
-                                    //loader(wck).then(img => {
+                                    loader(wck).then(img => {
                                         $('#swipeboxExample').append('<a class="swipeboxExampleImg"' +
                                         'href="'+ wck + '"' + '>' +
                                         '<img '+
@@ -71,7 +72,7 @@ $(function() {
                                         '</a>');
                                         $('#swipeboxExample').justifiedGallery('norewind');
                                     }, counter);
-                                //});
+                                });
 
                                // console.log("load photo in : " + counter )
                                 //console.log("load photo in : " + name )
