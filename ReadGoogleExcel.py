@@ -161,7 +161,8 @@ def querySpreadSheetData():
             values_input += result_input.get('values', [])
         else:
             values_input += result_input.get('values', [])[1:]
-    return values_input
+    retSheetData = list(map(lambda dt2: dt2[:14],filter(lambda dt: dt[0] != '', values_input)))
+    return retSheetData
 
 def getSpreadSheetData():
     spreadSheetData = querySpreadSheetData()
@@ -174,7 +175,7 @@ def getSpreadSheetDataUniteDates():
     spreadSheetData = querySpreadSheetData()
     dateSets = set()
     for row in spreadSheetData[1:]:
-        if len(row) != 0:
+        if len(row) != 0 and row[12] != '':
             dateSets.add(row[12].replace('-', '/'))
 
     return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
