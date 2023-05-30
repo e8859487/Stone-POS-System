@@ -175,7 +175,7 @@ def getSpreadSheetDataUniteDates():
     spreadSheetData = querySpreadSheetData()
     dateSets = set()
     for row in spreadSheetData[1:]:
-        if len(row) != 0 and row[12] != '':
+        if len(row) > 12 and row[12] != '':
             dateSets.add(row[12].replace('-', '/'))
 
     return sorted(dateSets, key=lambda d: tuple(map(int, d.split('/'))))
