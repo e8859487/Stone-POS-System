@@ -37,6 +37,7 @@ def parseData():
     dataPack = None
 
     # Try AI parser first
+    parse_method = "ai"
     try:
         from ai_parser import parse_with_ai
         dataPack = parse_with_ai(text)
@@ -45,11 +46,12 @@ def parseData():
 
     # Fallback to regex parser
     if dataPack is None:
+        parse_method = "regex"
         parser = DataParser.ReDataParser()
         parser.setData(text)
         dataPack = parser.parse()
 
-    retDict = {"success": 200, "msg": "上傳成功"}
+    retDict = {"success": 200, "msg": "上傳成功", "parseMethod": parse_method}
     retDict.update(dataPack.toDict())
     return jsonify(retDict)
 

@@ -176,10 +176,9 @@ $(function() {
                         radiobtn.checked = true;
                     }
 
-                    // clear input textarea
-                    //$("#orderForm > div > div:nth-child(1) > textarea").val("")
-                    // reset response text
-                    $("#lblAddDataResponse").text("")
+                    // show parse method
+                    var method = data.parseMethod == "ai" ? "🤖 AI" : "📝 Regex";
+                    $("#lblAddDataResponse").text("解析方式：" + method)
             },
             error:function(e){
                     alert("error", e);
