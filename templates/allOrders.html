@@ -197,7 +197,7 @@ $(document).on("click", ".btn-delete", function() {
     });
 });
 
-$(function() {
+window.addEventListener("load", function() {
     loadAllOrders();
     $("#refreshOrders").on("click", loadAllOrders);
 });
