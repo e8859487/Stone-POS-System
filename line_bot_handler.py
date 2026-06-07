@@ -80,10 +80,18 @@ def process_message(user_id, text, session):
     if text in ['幫助', 'help', '?', '？', '說明']:
         return get_help_text()
 
-    # Try to parse pasted text as an order
-    parser = DataParser.ReDataParser()
-    parser.setData(text)
-    dataPack = parser.parse()
+    # Try AI parser first, fallback to regex
+    dataPack = None
+    try:
+        from ai_parser import parse_with_ai
+        dataPack = parse_with_ai(text)
+    except Exception:
+        pass
+
+    if dataPack is None:
+        parser = DataParser.ReDataParser()
+        parser.setData(text)
+        dataPack = parser.parse()
 
     if dataPack.name and int(dataPack.numbers) > 0:
         session['state'] = STATE_CONFIRM

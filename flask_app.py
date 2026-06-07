@@ -33,9 +33,22 @@ def index():
 
 @app.route('/api_parseData', methods=['GET', 'POST'])
 def parseData():
-    parser = DataParser.ReDataParser()
-    parser.setData(flask.request.form['misc-input'])
-    dataPack = parser.parse()
+    text = flask.request.form['misc-input']
+    dataPack = None
+
+    # Try AI parser first
+    try:
+        from ai_parser import parse_with_ai
+        dataPack = parse_with_ai(text)
+    except Exception as e:
+        print("AI parse failed, fallback to regex:", e)
+
+    # Fallback to regex parser
+    if dataPack is None:
+        parser = DataParser.ReDataParser()
+        parser.setData(text)
+        dataPack = parser.parse()
+
     retDict = {"success": 200, "msg": "上傳成功"}
     retDict.update(dataPack.toDict())
     return jsonify(retDict)

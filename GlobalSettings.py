@@ -28,3 +28,7 @@ else:
 # Firebase
 FIREBASE_KEY_PATH = config.get('Firebase', 'SERVICE_ACCOUNT_KEY_PATH', fallback=None)
 DATA_BACKEND = config.get('Database', 'DATA_BACKEND', fallback='google_sheets')
+
+# DeepSeek
+DEEPSEEK_API_KEY = config.get('DeepSeek', 'API_KEY', fallback=None)
+DEEPSEEK_MODEL = config.get('DeepSeek', 'MODEL', fallback='deepseek-chat')
