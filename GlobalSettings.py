@@ -17,5 +17,10 @@ SalePrice = config['DataPack']['SalePrice']
 
 Scopes = config['GoogleSpreadSheet']['SCOPES']
 GOOGLE_SPREADSHEET_URL = config['GoogleSpreadSheet']['GOOGLE_SPREADSHEET_URL']
-SAMPLE_SPREADSHEET_ID_input = config['GoogleSpreadSheet']['SAMPLE_SPREADSHEET_ID_input']
-TEST_SPREADSHEET_ID_input = config['GoogleSpreadSheet']['TEST_SPREADSHEET_ID_input']
+
+import re
+_match = re.match(r'https://docs\.google\.com/spreadsheets/d/([a-zA-Z0-9_-]+)', GOOGLE_SPREADSHEET_URL)
+if _match:
+    SPREADSHEET_ID = _match.group(1)
+else:
+    SPREADSHEET_ID = None

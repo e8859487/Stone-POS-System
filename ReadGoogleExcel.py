@@ -11,9 +11,7 @@ import pathlib
 SettingFilePath = pathlib.Path(__file__).parent.joinpath("key.json")
 SCOPES = [GlobalSettings.Scopes]
 
-# here enter the id of your google sheet
-SAMPLE_SPREADSHEET_ID_input = GlobalSettings.SAMPLE_SPREADSHEET_ID_input
-TEST_SPREADSHEET_ID_input = GlobalSettings.TEST_SPREADSHEET_ID_input
+SPREADSHEET_ID = GlobalSettings.SPREADSHEET_ID
 SAMPLE_RANGE_NAME = 'A1:AA1000'
 SHEET_RESPONSE_RANGE = '表單回應 1!A1:R999'  # filled by customers
 AUTO_FILL_TABLE_NAME = '全自動資料表'
@@ -41,7 +39,7 @@ def main():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
+    result_input = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                       range=SAMPLE_RANGE_NAME).execute()
     values_input = result_input.get('values', [])
 
@@ -115,7 +113,7 @@ def querySpreadSheetData():
     # Call the Sheets API
     sheet = service.spreadsheets()
     for sheetRange in (AUTO_FILL_TABLE_NAME,):
-        result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
+        result_input = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                       range=sheetRange).execute()
         if len(values_input) == 0:
             values_input += result_input.get('values', [])
@@ -146,7 +144,7 @@ def CreateSheet():
         return
 
     #  check sheet existence
-    spreadSheets = service.spreadsheets().get(spreadsheetId=TEST_SPREADSHEET_ID_input).execute()
+    spreadSheets = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
     for sheet in spreadSheets['sheets']:
         sheetTitle = sheet['properties']['title']
         if sheetTitle == AUTO_FILL_TABLE_NAME:
@@ -164,7 +162,7 @@ def CreateSheet():
             }}
             ]
         }
-        request = service.spreadsheets().batchUpdate(spreadsheetId=TEST_SPREADSHEET_ID_input,
+        request = service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID,
                                                      body=batch_update_spreadsheet_request_body)
         response = request.execute()
         print("Create New sheet:", AUTO_FILL_TABLE_NAME)
@@ -203,7 +201,7 @@ def AddSpreadSheetData(rowDatas):
     }
 
     request = service.spreadsheets().values().append(
-        spreadsheetId=TEST_SPREADSHEET_ID_input, range=range_,
+        spreadsheetId=SPREADSHEET_ID, range=range_,
         valueInputOption=value_input_option,
         insertDataOption=insert_data_option, body=value_range_body)
     response = request.execute()

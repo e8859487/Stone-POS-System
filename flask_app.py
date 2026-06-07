@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import flask
 from flask import Flask, render_template, jsonify
 import DataParser
 import Controls
@@ -10,10 +11,21 @@ import static.photoGallery.common_tools as tools
 
 
 app = Flask(__name__)
-# Note: A secret key is included in the sample so that it works.
-# If you use this code in your application, replace this with a truly secret
-# key. See https://flask.palletsprojects.com/quickstart/#sessions.
 app.secret_key = GlobalSettings.FlaskSecretKey
+
+_CONFIG_ERROR = None
+if GlobalSettings.SPREADSHEET_ID is None:
+    _CONFIG_ERROR = (
+        'GOOGLE_SPREADSHEET_URL 格式錯誤！<br><br>'
+        '目前的值：<code>{}</code><br><br>'
+        '正確格式：<code>https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit</code><br><br>'
+        '請修正 SETTING.ini 後重啟。'
+    ).format(GlobalSettings.GOOGLE_SPREADSHEET_URL)
+
+@app.before_request
+def check_config():
+    if _CONFIG_ERROR and not flask.request.path.startswith('/static'):
+        return '<h2 style="color:red;">⚠ 設定錯誤</h2><p>{}</p>'.format(_CONFIG_ERROR), 500
 
 @app.route('/')
 def index():
