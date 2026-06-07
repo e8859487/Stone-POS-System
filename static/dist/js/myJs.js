@@ -178,7 +178,9 @@ $(function() {
 
                     // show parse method
                     var method = data.parseMethod == "ai" ? "🤖 AI" : "📝 Regex";
-                    $("#lblAddDataResponse").text("解析方式：" + method)
+                    var info = "解析方式：" + method;
+                    if (data.aiError) info += " (" + data.aiError + ")";
+                    $("#lblAddDataResponse").text(info)
             },
             error:function(e){
                     alert("error", e);

@@ -38,20 +38,24 @@ def parseData():
 
     # Try AI parser first
     parse_method = "ai"
+    ai_error = ""
     try:
         from ai_parser import parse_with_ai
         dataPack = parse_with_ai(text)
     except Exception as e:
+        ai_error = str(e)
         print("AI parse failed, fallback to regex:", e)
 
     # Fallback to regex parser
     if dataPack is None:
         parse_method = "regex"
+        if not ai_error:
+            ai_error = "no API key"
         parser = DataParser.ReDataParser()
         parser.setData(text)
         dataPack = parser.parse()
 
-    retDict = {"success": 200, "msg": "上傳成功", "parseMethod": parse_method}
+    retDict = {"success": 200, "msg": "上傳成功", "parseMethod": parse_method, "aiError": ai_error}
     retDict.update(dataPack.toDict())
     return jsonify(retDict)
 
