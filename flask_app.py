@@ -145,6 +145,26 @@ def importDataFromGoogleSpread():
                }
     return retDict
 
+@app.route('/all_orders')
+def all_orders():
+    orderedDoc = render_template('allOrders.html')
+    return render_template('index.html', table=orderedDoc, NavIndex=5)
+
+@app.route('/api_allOrders')
+def api_all_orders():
+    repo = get_repository()
+    dates = repo.get_available_shipping_dates()
+    all_orders = []
+    for date in dates:
+        orders = repo.get_orders_by_shipping_date(date)
+        for dp in orders:
+            d = dp.toDict()
+            d['arrivalTime'] = dp.arrivalTimeFormat
+            d['paymentMethod'] = dp.paymentMethodFormat
+            d['source'] = getattr(dp, '_source', '')
+            all_orders.append(d)
+    return jsonify({"isSuccess": True, "orders": all_orders})
+
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():
     message = ''

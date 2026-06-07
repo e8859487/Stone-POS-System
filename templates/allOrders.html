@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h4>所有訂單全覽</h4>
+    <button id="refreshOrders" class="btn btn-outline-secondary btn-sm">重新整理</button>
+</div>
+
+<div id="orderSummary" class="mb-3">
+    <span class="badge bg-secondary" id="totalCount">載入中...</span>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm" id="allOrdersTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>出貨日期</th>
+                <th>收件人</th>
+                <th>地址</th>
+                <th>電話</th>
+                <th>數量(箱)</th>
+                <th>到貨日期</th>
+                <th>時段</th>
+                <th>付款方式</th>
+                <th>備註</th>
+                <th>來源</th>
+            </tr>
+        </thead>
+        <tbody id="orderTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+function loadAllOrders() {
+    $("#totalCount").text("載入中...");
+    $.ajax({
+        url: "api_allOrders",
+        type: "get",
+        dataType: "json",
+        success: function(data) {
+            if (!data.isSuccess) {
+                $("#totalCount").text("載入失敗：" + data.msg);
+                return;
+            }
+            var orders = data.orders;
+            $("#totalCount").text("共 " + orders.length + " 筆訂單");
+            var tbody = $("#orderTableBody");
+            tbody.empty();
+            for (var i = 0; i < orders.length; i++) {
+                var o = orders[i];
+                var row = "<tr>" +
+                    "<td>" + (i + 1) + "</td>" +
+                    "<td>" + (o.shippingDate || "") + "</td>" +
+                    "<td>" + (o.name || "") + "</td>" +
+                    "<td>" + (o.address || "") + "</td>" +
+                    "<td>" + (o.mPhone || o.phone || "") + "</td>" +
+                    "<td>" + (o.numbers || "") + "</td>" +
+                    "<td>" + (o.arrivalDate || "") + "</td>" +
+                    "<td>" + (o.arrivalTime || "") + "</td>" +
+                    "<td>" + (o.paymentMethod || "") + "</td>" +
+                    "<td>" + (o.userComment || "") + "</td>" +
+                    "<td>" + (o.source || "") + "</td>" +
+                    "</tr>";
+                tbody.append(row);
+            }
+        },
+        error: function() {
+            $("#totalCount").text("載入失敗");
+        }
+    });
+}
+
+$(function() {
+    loadAllOrders();
+    $("#refreshOrders").on("click", loadAllOrders);
+});
+</script>

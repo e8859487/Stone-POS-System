@@ -147,6 +147,7 @@ class DataPack(object):
                             else PAYMENTMETHOD_TRANSFER)
         dp.userComment = d.get('userComment', '')
         dp.googleComment = d.get('googleComment', '')
+        dp._source = d.get('source', '')
         return dp
 
     def toGoogleSpreadSheetFormat(self):

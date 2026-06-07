@@ -58,6 +58,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="{{url_for('all_orders')}}">
+                  <span data-feather="list"></span>
+                  訂單全覽
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="{{url_for('new_orders')}}">
                   <span data-feather="shopping-cart"></span>
                   新增至 Google 表單
@@ -130,6 +136,8 @@
             $("#sidebarMenu > div > ul > li:nth-child(3) > a").addClass("active")
           }else if ("{{ NavIndex }}" == 4) {
             $("#sidebarMenu > div > ul > li:nth-child(4) > a").addClass("active")
+          }else if ("{{ NavIndex }}" == 5) {
+            $("#sidebarMenu > div > ul > li:nth-child(2) > a").addClass("active")
           }
         }
         UpdateNavSelection()
