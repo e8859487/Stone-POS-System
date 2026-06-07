@@ -186,6 +186,56 @@ $(function() {
             }
         })});
 
+// Image upload → AI parse
+$( "#imageUpload" ).on( "change", function(){
+    var file = this.files[0];
+    if (!file) return;
+    var formData = new FormData();
+    formData.append('image', file);
+    $("#imageStatus").text("解析中...");
+    $.ajax({
+        url: "api_parseImage",
+        type: "post",
+        data: formData,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        success: function(data){
+            $("#imageStatus").text("解析完成");
+            if (data.name != "") $("#name-input").val(data.name);
+            if (data.address != "") $("#address-input").val(data.address);
+            if (data.phone != "") $("#phone-input").val(data.phone);
+            if (data.mPhone != "") $("#mPhone-input").val(data.mPhone);
+            if (data.numbers != "" && data.numbers != "0") $("#numbers-input").val(data.numbers);
+            if (data.arrivalDate != ""){
+                var from = data.arrivalDate.split("/");
+                var f = new Date(from[0], from[1]-1, parseInt(from[2]));
+                var day = ("0" + f.getDate()).slice(-2);
+                var month = ("0" + (f.getMonth() + 1)).slice(-2);
+                var tomorrow = f.getFullYear()+"-"+(month)+"-"+(day);
+                $('#arrivalDate-input').val(tomorrow);
+            }
+            if (data.arrivalTime == "2"){
+                document.getElementById("arriveOnAfternoon-input").checked = true;
+            } else if (data.arrivalTime == "1"){
+                document.getElementById("arriveTimeOnMorning-input").checked = true;
+            }
+            if (data.paymentMethod == "2"){
+                document.getElementById("cashOnDelivery-input").checked = true;
+            } else if (data.paymentMethod == "1"){
+                document.getElementById("transfer-input").checked = true;
+            }
+            $("#lblAddDataResponse").text("");
+            // reset file input
+            $("#imageUpload").val("");
+        },
+        error: function(e){
+            $("#imageStatus").text("解析失敗");
+            $("#imageUpload").val("");
+        }
+    });
+});
+
 $( "#btnAddNewOrder" ).on( "click", function(){
         if($("#name-input").val() == "" ){
             alert("請輸入姓名")

@@ -53,6 +53,29 @@ def parseData():
     retDict.update(dataPack.toDict())
     return jsonify(retDict)
 
+@app.route('/api_parseImage', methods=['POST'])
+def parseImage():
+    if 'image' not in flask.request.files:
+        return jsonify({"success": 400, "msg": "沒有上傳圖片"})
+
+    file = flask.request.files['image']
+    image_bytes = file.read()
+    content_type = file.content_type or 'image/jpeg'
+
+    try:
+        from ai_parser import parse_image_with_ai
+        dataPack = parse_image_with_ai(image_bytes, content_type)
+    except Exception as e:
+        print("Image parse failed:", e)
+        return jsonify({"success": 500, "msg": "圖片解析失敗：{}".format(str(e))})
+
+    if dataPack is None:
+        return jsonify({"success": 500, "msg": "無法解析圖片"})
+
+    retDict = {"success": 200, "msg": "解析成功"}
+    retDict.update(dataPack.toDict())
+    return jsonify(retDict)
+
 @app.route('/api_addNewData', methods=['GET', 'POST'])
 def addNewDataToGoogleSpreadSheet():
     parser = DataParser.HtmlFormDataParser()

@@ -1,4 +1,5 @@
 import json
+import base64
 import requests
 import GlobalSettings
 from DataPack import (
@@ -58,6 +59,48 @@ def parse_with_ai(text):
 
     content = response.json()['choices'][0]['message']['content']
     # Strip markdown code fences if present
+    content = content.strip()
+    if content.startswith('```'):
+        content = content.split('\n', 1)[1]
+        content = content.rsplit('```', 1)[0]
+
+    data = json.loads(content)
+    return _dict_to_datapack(data)
+
+
+def parse_image_with_ai(image_bytes, content_type='image/jpeg'):
+    """Use DeepSeek vision to parse an order image into a DataPack."""
+    api_key = GlobalSettings.DEEPSEEK_API_KEY
+    model = GlobalSettings.DEEPSEEK_MODEL
+
+    if not api_key:
+        return None
+
+    b64 = base64.b64encode(image_bytes).decode('utf-8')
+    data_url = 'data:{};base64,{}'.format(content_type, b64)
+
+    response = requests.post(
+        'https://api.deepseek.com/chat/completions',
+        headers={
+            'Authorization': 'Bearer {}'.format(api_key),
+            'Content-Type': 'application/json',
+        },
+        json={
+            'model': model,
+            'messages': [
+                {'role': 'system', 'content': SYSTEM_PROMPT},
+                {'role': 'user', 'content': [
+                    {'type': 'image_url', 'image_url': {'url': data_url}},
+                    {'type': 'text', 'text': '請從這張圖片中擷取訂單資訊'},
+                ]},
+            ],
+            'temperature': 0,
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
+
+    content = response.json()['choices'][0]['message']['content']
     content = content.strip()
     if content.startswith('```'):
         content = content.split('\n', 1)[1]
