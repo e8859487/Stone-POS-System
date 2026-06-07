@@ -1,0 +1,18 @@
+[default]
+FlaskSecretKey = your_flask_secret_key_here
+
+[DataPack]
+Sender = 福石園
+SendersAddress = 你的地址
+SendersMobilePhone = 0912-345-678
+SalePrice = 800
+
+[GoogleSpreadSheet]
+SCOPES = https://www.googleapis.com/auth/spreadsheets
+GOOGLE_SPREADSHEET_URL = https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit
+SAMPLE_SPREADSHEET_ID_input = YOUR_SHEET_ID
+TEST_SPREADSHEET_ID_input = YOUR_TEST_SHEET_ID
+
+[LineBot]
+LINE_CHANNEL_SECRET = your_line_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN = your_line_channel_access_token

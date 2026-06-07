@@ -300,6 +300,25 @@ def print_index_table():
 # === Google API End ===
 
 
+# === Line Bot ===
+@app.route('/linebot/webhook', methods=['POST'])
+def linebot_webhook():
+    import flask
+    from line_bot_handler import handle_webhook
+    from linebot.v3.exceptions import InvalidSignatureError
+
+    signature = flask.request.headers.get('X-Line-Signature', '')
+    body = flask.request.get_data(as_text=True)
+
+    try:
+        handle_webhook(body, signature)
+    except InvalidSignatureError:
+        return 'Invalid signature', 400
+
+    return 'OK'
+# === Line Bot End ===
+
+
 if __name__ == '__main__':
     # When running locally, disable OAuthlib's HTTPs verification.
     # ACTION ITEM for developers:

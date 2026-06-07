@@ -57,92 +57,52 @@ def credentials_to_dict(credentials):
             'client_secret': credentials.client_secret,
             'scopes': credentials.scopes}
 
+TOKEN_PATH = pathlib.Path(__file__).parent.joinpath('token.pickle')
+
 class GoogleServiceMgr(object):
 
     def __init__(self):
-        self._credential = None
+        self._credientials = None
 
     @property
     def credientials(self):
-        creds = None
-        if os.path.exists('token.pickle'):
-            with open('token.pickle', 'rb') as token:
-                creds = pickle.load(token)
-
-        if not creds or not creds.valid:
-            # if creds and creds.expired and creds.refresh_token:
-            return None
-
-
-        return credentials_to_dict(creds)
-                # creds.refresh(Request())
-        # return self._credential
+        return self._credientials
 
     @credientials.setter
     def credientials(self, cred):
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(cred, token)
-
-        # if cred is reset
+        global service
+        service = None  # force initService() to rebuild with new creds
         if cred is None:
-            global service
-            service = None
-        # self._credential = cred
+            return
+        with open(TOKEN_PATH, 'wb') as token:
+            pickle.dump(cred, token)
 
 GoogleMgr = GoogleServiceMgr()
 
 
 def initService():
-    import google.oauth2.credentials
-    global values_input, service
+    global service
     if service is not None:
-        try:
-            # creds = google.oauth2.credentials.Credentials(
-            #     **GoogleMgr.credientials)
-            # service = build('sheets', 'v4', credentials=creds)
-            # if not creds.valid:
-            #     if creds and creds.expired and creds.refresh_token:
-            #         creds.refresh(Request())
-            # # test if the token is work or not
-            # sheet = service.spreadsheets()
-            # result_input = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID_input,
-            #                                   range=AUTO_FILL_TABLE_NAME).execute()
-            return True
-        except:
-            service = None
-            if os.path.exists('token.pickle'):
-                os.remove('token.pickle')
-            return False
+        return True
 
-        #return True
+    creds = None
+    if TOKEN_PATH.exists():
+        with open(TOKEN_PATH, 'rb') as token:
+            creds = pickle.load(token)
 
-    # if 'credentials' not in flask.session:
-    #     return False
-    if GoogleMgr.credientials is None:
+    if not creds:
         return False
 
-        # Load credentials from the session.
-    # creds = google.oauth2.credentials.Credentials(
-    #     **flask.session['credentials'])
-    creds = google.oauth2.credentials.Credentials(
-        **GoogleMgr.credientials)
+    # Auto-refresh expired token so user never needs to re-login
+    if creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        with open(TOKEN_PATH, 'wb') as token:
+            pickle.dump(creds, token)
 
-    # creds = None
-    # if os.path.exists('token.pickle'):
-    #     with open('token.pickle', 'rb') as token:
-    #         creds = pickle.load(token)
-    # if not creds or not creds.valid:
-    #     if creds and creds.expired and creds.refresh_token:
-    #         creds.refresh(Request())
-    #     else:
-    #         flow = InstalledAppFlow.from_client_secrets_file(
-    #             SettingFilePath.as_posix(), SCOPES)  # here enter the name of your downloaded JSON file
-    #         creds = flow.run_local_server()
-    #     with open('token.pickle', 'wb') as token:
-    #         pickle.dump(creds, token)
-    #
+    if not creds.valid:
+        return False
+
     service = build('sheets', 'v4', credentials=creds)
-    # flask.session['credentials'] = credentials_to_dict(creds)
     CreateSheet()
     return True
 
