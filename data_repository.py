@@ -16,3 +16,11 @@ class DataRepository:
     def get_all_orders(self):
         """Returns list of all DataPack objects."""
         raise NotImplementedError
+
+    def update_order(self, order_id, data_pack):
+        """Update an existing order. Returns True on success."""
+        raise NotImplementedError
+
+    def delete_order(self, order_id):
+        """Delete an order. Returns True on success."""
+        raise NotImplementedError

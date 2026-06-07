@@ -157,11 +157,40 @@ def api_all_orders():
     all_orders = []
     for dp in orders:
         d = dp.toDict()
+        d['id'] = getattr(dp, '_doc_id', '')
         d['arrivalTime'] = dp.arrivalTimeFormat
         d['paymentMethod'] = dp.paymentMethodFormat
         d['source'] = getattr(dp, '_source', '')
         all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
+
+@app.route('/api_updateOrder', methods=['POST'])
+def api_update_order():
+    from DataPack import DataPack as DP
+    data = flask.request.get_json()
+    order_id = data.get('id')
+    if not order_id:
+        return jsonify({"isSuccess": False, "msg": "缺少訂單 ID"})
+    dp = DP.from_firestore_dict(data)
+    repo = get_repository()
+    try:
+        repo.update_order(order_id, dp)
+        return jsonify({"isSuccess": True, "msg": "更新成功"})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
+
+@app.route('/api_deleteOrder', methods=['POST'])
+def api_delete_order():
+    data = flask.request.get_json()
+    order_id = data.get('id')
+    if not order_id:
+        return jsonify({"isSuccess": False, "msg": "缺少訂單 ID"})
+    repo = get_repository()
+    try:
+        repo.delete_order(order_id)
+        return jsonify({"isSuccess": True, "msg": "刪除成功"})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
 
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():

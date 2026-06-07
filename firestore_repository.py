@@ -57,5 +57,16 @@ class FirestoreRepository(DataRepository):
         orders = []
         for doc in docs:
             dp = DataPack.from_firestore_dict(doc.to_dict())
+            dp._doc_id = doc.id
             orders.append(dp)
         return orders
+
+    def update_order(self, order_id, data_pack):
+        doc = data_pack.toFirestoreDict()
+        doc.pop('timestamp', None)
+        self.collection.document(order_id).update(doc)
+        return True
+
+    def delete_order(self, order_id):
+        self.collection.document(order_id).delete()
+        return True

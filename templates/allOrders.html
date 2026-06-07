@@ -22,6 +22,7 @@
                 <th>付款方式</th>
                 <th>備註</th>
                 <th>來源</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody id="orderTableBody">
@@ -29,7 +30,53 @@
     </table>
 </div>
 
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">編輯訂單</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-id">
+        <div class="mb-2"><label>收件人</label><input type="text" class="form-control" id="edit-name"></div>
+        <div class="mb-2"><label>地址</label><input type="text" class="form-control" id="edit-address"></div>
+        <div class="mb-2"><label>電話</label><input type="text" class="form-control" id="edit-phone"></div>
+        <div class="mb-2"><label>手機</label><input type="text" class="form-control" id="edit-mPhone"></div>
+        <div class="row mb-2">
+            <div class="col"><label>數量(箱)</label><input type="number" class="form-control" id="edit-numbers"></div>
+            <div class="col"><label>出貨日期</label><input type="text" class="form-control" id="edit-shippingDate"></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col"><label>到貨日期</label><input type="text" class="form-control" id="edit-arrivalDate"></div>
+            <div class="col"><label>時段</label>
+                <select class="form-control" id="edit-arrivalTime">
+                    <option value="上午">上午</option>
+                    <option value="下午">下午</option>
+                    <option value="不指定">不指定</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-2"><label>付款方式</label>
+            <select class="form-control" id="edit-paymentMethod">
+                <option value="轉帳">轉帳</option>
+                <option value="貨到付款">貨到付款</option>
+            </select>
+        </div>
+        <div class="mb-2"><label>備註</label><input type="text" class="form-control" id="edit-userComment"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="saveEdit">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+var _allOrders = [];
+
 function loadAllOrders() {
     $("#totalCount").text("載入中...");
     $.ajax({
@@ -38,36 +85,117 @@ function loadAllOrders() {
         dataType: "json",
         success: function(data) {
             if (!data.isSuccess) {
-                $("#totalCount").text("載入失敗：" + data.msg);
+                $("#totalCount").text("載入失敗：" + (data.msg || "unknown"));
                 return;
             }
-            var orders = data.orders;
-            $("#totalCount").text("共 " + orders.length + " 筆訂單");
-            var tbody = $("#orderTableBody");
-            tbody.empty();
-            for (var i = 0; i < orders.length; i++) {
-                var o = orders[i];
-                var row = "<tr>" +
-                    "<td>" + (i + 1) + "</td>" +
-                    "<td>" + (o.shippingDate || "") + "</td>" +
-                    "<td>" + (o.name || "") + "</td>" +
-                    "<td>" + (o.address || "") + "</td>" +
-                    "<td>" + (o.mPhone || o.phone || "") + "</td>" +
-                    "<td>" + (o.numbers || "") + "</td>" +
-                    "<td>" + (o.arrivalDate || "") + "</td>" +
-                    "<td>" + (o.arrivalTime || "") + "</td>" +
-                    "<td>" + (o.paymentMethod || "") + "</td>" +
-                    "<td>" + (o.userComment || "") + "</td>" +
-                    "<td>" + (o.source || "") + "</td>" +
-                    "</tr>";
-                tbody.append(row);
-            }
+            _allOrders = data.orders;
+            $("#totalCount").text("共 " + _allOrders.length + " 筆訂單");
+            renderTable();
         },
-        error: function() {
-            $("#totalCount").text("載入失敗");
+        error: function(xhr) {
+            $("#totalCount").text("載入失敗 (" + xhr.status + ")");
         }
     });
 }
+
+function renderTable() {
+    var tbody = $("#orderTableBody");
+    tbody.empty();
+    for (var i = 0; i < _allOrders.length; i++) {
+        var o = _allOrders[i];
+        var row = "<tr>" +
+            "<td>" + (i + 1) + "</td>" +
+            "<td>" + (o.shippingDate || "") + "</td>" +
+            "<td>" + (o.name || "") + "</td>" +
+            "<td>" + (o.address || "") + "</td>" +
+            "<td>" + (o.mPhone || o.phone || "") + "</td>" +
+            "<td>" + (o.numbers || "") + "</td>" +
+            "<td>" + (o.arrivalDate || "") + "</td>" +
+            "<td>" + (o.arrivalTime || "") + "</td>" +
+            "<td>" + (o.paymentMethod || "") + "</td>" +
+            "<td>" + (o.userComment || "") + "</td>" +
+            "<td>" + (o.source || "") + "</td>" +
+            '<td>' +
+                '<button class="btn btn-sm btn-outline-primary me-1 btn-edit" data-idx="' + i + '">編輯</button>' +
+                '<button class="btn btn-sm btn-outline-danger btn-delete" data-idx="' + i + '">刪除</button>' +
+            '</td>' +
+            "</tr>";
+        tbody.append(row);
+    }
+}
+
+// Edit
+$(document).on("click", ".btn-edit", function() {
+    var idx = $(this).data("idx");
+    var o = _allOrders[idx];
+    $("#edit-id").val(o.id);
+    $("#edit-name").val(o.name);
+    $("#edit-address").val(o.address);
+    $("#edit-phone").val(o.phone);
+    $("#edit-mPhone").val(o.mPhone);
+    $("#edit-numbers").val(o.numbers);
+    $("#edit-shippingDate").val(o.shippingDate);
+    $("#edit-arrivalDate").val(o.arrivalDate);
+    $("#edit-arrivalTime").val(o.arrivalTime);
+    $("#edit-paymentMethod").val(o.paymentMethod);
+    $("#edit-userComment").val(o.userComment);
+    var modal = new bootstrap.Modal(document.getElementById("editModal"));
+    modal.show();
+});
+
+$("#saveEdit").on("click", function() {
+    var payload = {
+        id: $("#edit-id").val(),
+        name: $("#edit-name").val(),
+        address: $("#edit-address").val(),
+        phone: $("#edit-phone").val(),
+        mPhone: $("#edit-mPhone").val(),
+        numbers: parseInt($("#edit-numbers").val()) || 0,
+        shippingDate: $("#edit-shippingDate").val(),
+        arrivalDate: $("#edit-arrivalDate").val(),
+        arrivalTime: $("#edit-arrivalTime").val(),
+        paymentMethod: $("#edit-paymentMethod").val(),
+        userComment: $("#edit-userComment").val()
+    };
+    $.ajax({
+        url: "api_updateOrder",
+        type: "post",
+        contentType: "application/json",
+        data: JSON.stringify(payload),
+        dataType: "json",
+        success: function(data) {
+            if (data.isSuccess) {
+                bootstrap.Modal.getInstance(document.getElementById("editModal")).hide();
+                loadAllOrders();
+            } else {
+                alert("更新失敗：" + data.msg);
+            }
+        },
+        error: function() { alert("更新失敗"); }
+    });
+});
+
+// Delete
+$(document).on("click", ".btn-delete", function() {
+    var idx = $(this).data("idx");
+    var o = _allOrders[idx];
+    if (!confirm("確定刪除「" + o.name + "」的訂單？")) return;
+    $.ajax({
+        url: "api_deleteOrder",
+        type: "post",
+        contentType: "application/json",
+        data: JSON.stringify({ id: o.id }),
+        dataType: "json",
+        success: function(data) {
+            if (data.isSuccess) {
+                loadAllOrders();
+            } else {
+                alert("刪除失敗：" + data.msg);
+            }
+        },
+        error: function() { alert("刪除失敗"); }
+    });
+});
 
 $(function() {
     loadAllOrders();
