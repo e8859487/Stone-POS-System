@@ -51,3 +51,11 @@ class FirestoreRepository(DataRepository):
             if sd:
                 dates.add(sd.replace('-', '/'))
         return sorted(dates, key=lambda d: tuple(map(int, d.split('/'))))
+
+    def get_all_orders(self):
+        docs = self.collection.stream()
+        orders = []
+        for doc in docs:
+            dp = DataPack.from_firestore_dict(doc.to_dict())
+            orders.append(dp)
+        return orders

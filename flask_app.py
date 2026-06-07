@@ -153,16 +153,14 @@ def all_orders():
 @app.route('/api_allOrders')
 def api_all_orders():
     repo = get_repository()
-    dates = repo.get_available_shipping_dates()
+    orders = repo.get_all_orders()
     all_orders = []
-    for date in dates:
-        orders = repo.get_orders_by_shipping_date(date)
-        for dp in orders:
-            d = dp.toDict()
-            d['arrivalTime'] = dp.arrivalTimeFormat
-            d['paymentMethod'] = dp.paymentMethodFormat
-            d['source'] = getattr(dp, '_source', '')
-            all_orders.append(d)
+    for dp in orders:
+        d = dp.toDict()
+        d['arrivalTime'] = dp.arrivalTimeFormat
+        d['paymentMethod'] = dp.paymentMethodFormat
+        d['source'] = getattr(dp, '_source', '')
+        all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
 
 @app.route('/show_orders', methods=['GET', 'POST'])

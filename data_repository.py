@@ -12,3 +12,7 @@ class DataRepository:
     def get_available_shipping_dates(self):
         """Returns sorted list of unique shipping date strings."""
         raise NotImplementedError
+
+    def get_all_orders(self):
+        """Returns list of all DataPack objects."""
+        raise NotImplementedError
