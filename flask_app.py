@@ -4,8 +4,8 @@ import flask
 from flask import Flask, render_template, jsonify
 import DataParser
 import Controls
-from ReadGoogleExcel import getSpreadSheetData, AddSpreadSheetData, CreateSheet, initService, GoogleMgr, \
-    getSpreadSheetDataUniteDates
+from ReadGoogleExcel import initService, GoogleMgr
+from data_repository_factory import get_repository
 import GlobalSettings
 import static.photoGallery.common_tools as tools
 
@@ -45,7 +45,8 @@ def addNewDataToGoogleSpreadSheet():
     parser = DataParser.HtmlFormDataParser()
     parser.setData(flask.request.form)
     dataPack = parser.parse()
-    isSuccess = AddSpreadSheetData(dataPack.toGoogleSpreadSheetFormat())
+    repo = get_repository()
+    isSuccess = repo.add_order(dataPack)
     if isSuccess:
         return jsonify({"isSuccess": True, "msg": "上傳成功"})
     return jsonify({"isSuccess": False, "msg": "上傳失敗"})
@@ -57,27 +58,23 @@ def openGoogleSpreadSheet():
 
 @app.route('/api_importDataFromGoogleSpread', methods=['GET', 'POST'])
 def importDataFromGoogleSpread():
-    # if 'ImportDataFromGoogleSpread' in flask.request.form:
+    import datetime as dt
     shippingDate = str(flask.request.form['GoogleSpreadShippingDate-input'])
     if shippingDate == "":
         return jsonify({"isSuccess": False, "msg": "請選擇日期！"})
     shippingDate = shippingDate.split(' ')[0]
-    Controls.clearOrderData()
-    rawDatas = getSpreadSheetData()
-    from DataParser import GoogleSpreadDataParser
-    parser = GoogleSpreadDataParser()
+    parsed = dt.datetime.strptime(shippingDate, "%Y/%m/%d")
+    strShippingDate = "{}/{}/{}".format(parsed.year, parsed.month, parsed.day)
 
-    import datetime
-    shippingDate = datetime.datetime.strptime(shippingDate, "%Y/%m/%d")
-    strShippingDate = "{}/{}/{}".format(shippingDate.year, shippingDate.month, shippingDate.day)
+    Controls.clearOrderData()
+    repo = get_repository()
+    orders = repo.get_orders_by_shipping_date(strShippingDate)
+
     totoalNumbers = 0
     totoalNumbersOfPack = 0
     totoalNumbersOf2 = 0
     totoalNumbersOf2_name = ["&nbsp&nbsp-"]
-    for row in rawDatas[rawDatas['出貨日期'] == strShippingDate][GoogleSpreadDataParser.interestColumn].iterrows():
-        parser.setData(row)
-        dataPack = parser.parse()
-        # TODO : remove global varable Controls
+    for dataPack in orders:
         Controls.addNewOrderData(dataPack)
         totoalNumbers += int(dataPack.numbers)
         totoalNumbersOfPack += int(dataPack.numbersOfPack)
@@ -87,7 +84,6 @@ def importDataFromGoogleSpread():
                 totoalNumbersOf2_name.append(dataPack.name)
             else:
                 totoalNumbersOf2_name.append("{}({}箱)".format(dataPack.name, int(dataPack.numbers) % 4))
-
             totoalNumbersOf2_name.append(",&nbsp")
 
         if len(totoalNumbersOf2_name) > 1:
@@ -109,22 +105,17 @@ def importDataFromGoogleSpread():
 
 @app.route('/show_orders', methods=['GET', 'POST'])
 def show_orders():
-    if not initService():
-        return flask.redirect('authorize')
     message = ''
     if 'ClearAllOrders' in flask.request.form:
         Controls.clearOrderData()
-    # https://stackoverflow.com/questions/15321431/how-to-pass-a-list-from-python-by-jinja2-to-javascript
-    OrderDateList = getSpreadSheetDataUniteDates()
+    repo = get_repository()
+    OrderDateList = repo.get_available_shipping_dates()
     orderedDoc = render_template('showOrders.html', message=message )
     SubPageJS = render_template('partial_showOrder.js', orderDates=OrderDateList )
     return render_template('index.html', table=orderedDoc, NavIndex=1, SubPageJS=SubPageJS)
 
 @app.route('/new_orders', methods=['GET', 'POST'])
 def new_orders():
-    if not initService():
-        return flask.redirect('authorize')
-
     orderedDoc = render_template('newOrders.html')
     return render_template('index.html', table=orderedDoc, NavIndex=2)
 

@@ -1,0 +1,7 @@
+SETTING.ini
+key.json
+firebase-key.json
+token.pickle
+__pycache__/
+*.pyc
+.DS_Store

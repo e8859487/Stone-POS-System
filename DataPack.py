@@ -109,6 +109,46 @@ class DataPack(object):
             "arrivalTime": self.arrivalTime
         }
 
+    def toFirestoreDict(self, source="web"):
+        return {
+            "timestamp": datetime.datetime.now(),
+            "name": self.name or "",
+            "arrivalDate": self.arrivalDate or "",
+            "arrivalTime": self.arrivalTimeFormat,
+            "address": self.address or "",
+            "phone": self.phone or "",
+            "mPhone": self.mPhone or "",
+            "numbers": int(self.numbers) if self.numbers else 0,
+            "paymentMethod": self.paymentMethodFormat,
+            "googleComment": self.googleComment or "",
+            "userComment": self.userComment or "",
+            "shippingDate": self.shippingDate or "",
+            "source": source,
+        }
+
+    @classmethod
+    def from_firestore_dict(cls, d):
+        import math
+        dp = cls()
+        dp.name = d.get('name', '')
+        dp.address = d.get('address', '')
+        dp.phone = d.get('phone', '')
+        dp.mPhone = d.get('mPhone', '')
+        dp.shippingDate = d.get('shippingDate', '')
+        dp.arrivalDate = d.get('arrivalDate', '')
+        dp.arrivalTime = {
+            '上午': ARRIVALTIME_MORNING,
+            '下午': ARRIVALTIME_AFTERNOON,
+        }.get(d.get('arrivalTime', ''), ARRIVALTIME_NOT_SPECIFIED)
+        dp.numbers = str(d.get('numbers', 0))
+        dp.numbersOfPack = str(math.ceil(int(dp.numbers) / 4.0)) if int(dp.numbers) > 0 else '0'
+        dp.paymentMethod = (PAYMENTMETHOD_PAY_ON_DELIVERY
+                            if d.get('paymentMethod') == '貨到付款'
+                            else PAYMENTMETHOD_TRANSFER)
+        dp.userComment = d.get('userComment', '')
+        dp.googleComment = d.get('googleComment', '')
+        return dp
+
     def toGoogleSpreadSheetFormat(self):
         # 收件人
         # 到貨日期

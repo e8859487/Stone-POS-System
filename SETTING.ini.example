@@ -11,6 +11,12 @@ SalePrice = 800
 SCOPES = https://www.googleapis.com/auth/spreadsheets
 GOOGLE_SPREADSHEET_URL = https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit
 
+[Firebase]
+SERVICE_ACCOUNT_KEY_PATH = firebase-key.json
+
+[Database]
+DATA_BACKEND = firestore
+
 [LineBot]
 LINE_CHANNEL_SECRET = your_line_channel_secret
 LINE_CHANNEL_ACCESS_TOKEN = your_line_channel_access_token

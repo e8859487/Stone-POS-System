@@ -24,3 +24,7 @@ if _match:
     SPREADSHEET_ID = _match.group(1)
 else:
     SPREADSHEET_ID = None
+
+# Firebase
+FIREBASE_KEY_PATH = config.get('Firebase', 'SERVICE_ACCOUNT_KEY_PATH', fallback=None)
+DATA_BACKEND = config.get('Database', 'DATA_BACKEND', fallback='google_sheets')
