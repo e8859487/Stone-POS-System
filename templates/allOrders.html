@@ -75,6 +75,8 @@
 </div>
 
 <script>
+window.addEventListener("load", function() {
+
 var _allOrders = [];
 
 function loadAllOrders() {
@@ -197,8 +199,8 @@ $(document).on("click", ".btn-delete", function() {
     });
 });
 
-window.addEventListener("load", function() {
-    loadAllOrders();
-    $("#refreshOrders").on("click", loadAllOrders);
-});
+loadAllOrders();
+$("#refreshOrders").on("click", loadAllOrders);
+
+}); // end window.addEventListener
 </script>
