@@ -7,6 +7,8 @@ ARRIVALTIME_AFTERNOON = "2"
 ARRIVALTIME_NOT_SPECIFIED = "4"
 PAYMENTMETHOD_TRANSFER = "1"
 PAYMENTMETHOD_PAY_ON_DELIVERY = "2"
+DELIVERYTYPE_HOME_DELIVERY = "1"
+DELIVERYTYPE_SELF_PICKUP = "2"
 
 class DataPack(object):
     TableIndex = 0
@@ -35,6 +37,7 @@ class DataPack(object):
         self.numbersOfPack = "0"
         self.numbers = '0'  # TODO: adjust value according to numbersOfPack
         self.paymentMethod = PAYMENTMETHOD_TRANSFER  # 轉帳 1 / 貨到付款 2
+        self.deliveryType = DELIVERYTYPE_HOME_DELIVERY  # 宅配 1 / 自取 2
         self.userComment = ''
         self.googleComment = ''
 
@@ -53,6 +56,12 @@ class DataPack(object):
             return "轉帳"
         elif self.paymentMethod == PAYMENTMETHOD_PAY_ON_DELIVERY:
             return "貨到付款"
+    @property
+    def deliveryTypeFormat(self):
+        if self.deliveryType == DELIVERYTYPE_SELF_PICKUP:
+            return "自取"
+        return "宅配"
+
     @property
     def payOnDeliveryPrice(self):
         if self.paymentMethod == PAYMENTMETHOD_PAY_ON_DELIVERY:
@@ -106,7 +115,8 @@ class DataPack(object):
             "numbers": self.numbers,
             "userComment": self.userComment,
             "paymentMethod": self.paymentMethod,
-            "arrivalTime": self.arrivalTime
+            "arrivalTime": self.arrivalTime,
+            "deliveryType": self.deliveryType
         }
 
     def toFirestoreDict(self, source="web"):
@@ -123,6 +133,7 @@ class DataPack(object):
             "googleComment": self.googleComment or "",
             "userComment": self.userComment or "",
             "shippingDate": self.shippingDate or "",
+            "deliveryType": self.deliveryTypeFormat,
             "source": source,
         }
 
@@ -145,6 +156,9 @@ class DataPack(object):
         dp.paymentMethod = (PAYMENTMETHOD_PAY_ON_DELIVERY
                             if d.get('paymentMethod') == '貨到付款'
                             else PAYMENTMETHOD_TRANSFER)
+        dp.deliveryType = (DELIVERYTYPE_SELF_PICKUP
+                           if d.get('deliveryType') == '自取'
+                           else DELIVERYTYPE_HOME_DELIVERY)
         dp.userComment = d.get('userComment', '')
         dp.googleComment = d.get('googleComment', '')
         dp._source = d.get('source', '')

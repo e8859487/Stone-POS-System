@@ -1,5 +1,5 @@
 from DataPack import DataPack, PAYMENTMETHOD_TRANSFER, PAYMENTMETHOD_PAY_ON_DELIVERY, ARRIVALTIME_MORNING, \
-    ARRIVALTIME_AFTERNOON, ARRIVALTIME_NOT_SPECIFIED
+    ARRIVALTIME_AFTERNOON, ARRIVALTIME_NOT_SPECIFIED, DELIVERYTYPE_HOME_DELIVERY, DELIVERYTYPE_SELF_PICKUP
 import math
 import datetime
 
@@ -40,6 +40,9 @@ class ParserBase():
     def getPaymentMethod(self):
         raise NotImplementedError
 
+    def getDeliveryType(self):
+        return DELIVERYTYPE_HOME_DELIVERY
+
     def getGoogleComment(self):
         return ""
 
@@ -59,6 +62,7 @@ class ParserBase():
         dp.numbers = self.getNumbers()
         dp.userComment = self.getUserComment()
         dp.paymentMethod = self.getPaymentMethod()
+        dp.deliveryType = self.getDeliveryType()
         dp.googleComment = self.getGoogleComment()
         return dp
 
@@ -276,6 +280,11 @@ class HtmlFormDataParser(ParserBase):
             return PAYMENTMETHOD_PAY_ON_DELIVERY
         # if self.dt['PaymentMethod-input'] == "轉帳":
         return PAYMENTMETHOD_TRANSFER
+
+    def getDeliveryType(self):
+        if self.dt.get('deliveryType-input') == "自取":
+            return DELIVERYTYPE_SELF_PICKUP
+        return DELIVERYTYPE_HOME_DELIVERY
 
     def getUserComment(self):
         return self.dt['userComment-input']

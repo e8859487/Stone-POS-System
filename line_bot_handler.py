@@ -113,6 +113,7 @@ def format_order_preview(dp):
         '到貨日期：{}'.format(dp.arrivalDate or '(未填)'),
         '到貨時段：{}'.format(dp.arrivalTimeFormat),
         '付款方式：{}'.format(dp.paymentMethodFormat),
+        '配送方式：{}'.format(dp.deliveryTypeFormat),
         '',
         '回覆「確認」儲存，回覆其他任意文字取消。',
     ]

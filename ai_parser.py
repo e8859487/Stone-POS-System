@@ -4,7 +4,8 @@ import requests
 import GlobalSettings
 from DataPack import (
     DataPack, ARRIVALTIME_MORNING, ARRIVALTIME_AFTERNOON,
-    ARRIVALTIME_NOT_SPECIFIED, PAYMENTMETHOD_TRANSFER, PAYMENTMETHOD_PAY_ON_DELIVERY
+    ARRIVALTIME_NOT_SPECIFIED, PAYMENTMETHOD_TRANSFER, PAYMENTMETHOD_PAY_ON_DELIVERY,
+    DELIVERYTYPE_HOME_DELIVERY, DELIVERYTYPE_SELF_PICKUP
 )
 import math
 
@@ -20,6 +21,7 @@ SYSTEM_PROMPT = """你是一個訂單資料擷取助手。從使用者提供的�
   "numbers": 數量（整數，單位：箱）,
   "arrivalTime": "上午 或 下午 或 不指定",
   "paymentMethod": "轉帳 或 貨到付款",
+  "deliveryType": "自取 或 宅配",
   "userComment": "其他備註"
 }
 
@@ -133,6 +135,9 @@ def _dict_to_datapack(d):
 
     payment = d.get('paymentMethod', '')
     dp.paymentMethod = PAYMENTMETHOD_PAY_ON_DELIVERY if payment == '貨到付款' else PAYMENTMETHOD_TRANSFER
+
+    delivery = d.get('deliveryType', '')
+    dp.deliveryType = DELIVERYTYPE_SELF_PICKUP if delivery == '自取' else DELIVERYTYPE_HOME_DELIVERY
 
     dp.userComment = d.get('userComment', '') or ''
     return dp

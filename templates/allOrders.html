@@ -28,6 +28,7 @@
                 <th>到貨日期</th>
                 <th>時段</th>
                 <th>付款方式</th>
+                <th>配送方式</th>
                 <th>備註</th>
                 <th>來源</th>
                 <th>已收款</th>
@@ -68,11 +69,19 @@
                 </select>
             </div>
         </div>
-        <div class="mb-2"><label>付款方式</label>
-            <select class="form-control" id="edit-paymentMethod">
-                <option value="轉帳">轉帳</option>
-                <option value="貨到付款">貨到付款</option>
-            </select>
+        <div class="row mb-2">
+            <div class="col"><label>付款方式</label>
+                <select class="form-control" id="edit-paymentMethod">
+                    <option value="轉帳">轉帳</option>
+                    <option value="貨到付款">貨到付款</option>
+                </select>
+            </div>
+            <div class="col"><label>配送方式</label>
+                <select class="form-control" id="edit-deliveryType">
+                    <option value="宅配">宅配</option>
+                    <option value="自取">自取</option>
+                </select>
+            </div>
         </div>
         <div class="mb-2"><label>備註</label><input type="text" class="form-control" id="edit-userComment"></div>
       </div>
@@ -161,6 +170,7 @@ function renderTable() {
             "<td>" + (o.arrivalDate || "") + "</td>" +
             "<td>" + (o.arrivalTime || "") + "</td>" +
             "<td>" + (o.paymentMethod || "") + "</td>" +
+            "<td>" + (o.deliveryType || "宅配") + "</td>" +
             "<td>" + (o.userComment || "") + "</td>" +
             "<td>" + (o.source || "") + "</td>" +
             '<td><input type="checkbox" class="form-check-input chk-paid" data-idx="' + realIdx + '"' + (o.paid ? ' checked' : '') + '></td>' +
@@ -188,6 +198,7 @@ $(document).on("click", ".btn-edit", function() {
     $("#edit-arrivalDate").val(o.arrivalDate);
     $("#edit-arrivalTime").val(o.arrivalTime);
     $("#edit-paymentMethod").val(o.paymentMethod);
+    $("#edit-deliveryType").val(o.deliveryType || "宅配");
     $("#edit-userComment").val(o.userComment);
     var modal = new bootstrap.Modal(document.getElementById("editModal"));
     modal.show();
@@ -205,6 +216,7 @@ $("#saveEdit").on("click", function() {
         arrivalDate: $("#edit-arrivalDate").val(),
         arrivalTime: $("#edit-arrivalTime").val(),
         paymentMethod: $("#edit-paymentMethod").val(),
+        deliveryType: $("#edit-deliveryType").val(),
         userComment: $("#edit-userComment").val()
     };
     $.ajax({

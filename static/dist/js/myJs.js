@@ -194,6 +194,11 @@ $(function() {
                         radiobtn = document.getElementById("transfer-input");
                         radiobtn.checked = true;
                     }
+                    if (data.deliveryType == "2"){
+                        document.getElementById("deliverySelfPickup-input").checked = true;
+                    } else {
+                        document.getElementById("deliveryHomeDelivery-input").checked = true;
+                    }
 
                     // show parse method
                     var method = data.parseMethod == "ai" ? "🤖 AI" : "📝 Regex";
@@ -301,6 +306,7 @@ $( "#btnAddNewOrder" ).on( "click", function(){
                    radiobtn.checked = true;
                    radiobtn = document.getElementById("transfer-input");
                    radiobtn.checked = true;
+                   document.getElementById("deliveryHomeDelivery-input").checked = true;
                }else{
                    $("#lblAddDataResponse").text("新增失敗")
                }

@@ -110,13 +110,18 @@ def importDataFromGoogleSpread():
 
     Controls.clearOrderData()
     repo = get_repository()
-    orders = repo.get_orders_by_shipping_date(strShippingDate)
+    all_orders = repo.get_orders_by_shipping_date(strShippingDate)
 
+    from DataPack import DELIVERYTYPE_HOME_DELIVERY, DELIVERYTYPE_SELF_PICKUP
+    delivery_orders = [o for o in all_orders if o.deliveryType == DELIVERYTYPE_HOME_DELIVERY]
+    pickup_orders = [o for o in all_orders if o.deliveryType == DELIVERYTYPE_SELF_PICKUP]
+
+    # Table only shows delivery orders
     totoalNumbers = 0
     totoalNumbersOfPack = 0
     totoalNumbersOf2 = 0
     totoalNumbersOf2_name = ["&nbsp&nbsp-"]
-    for dataPack in orders:
+    for dataPack in delivery_orders:
         Controls.addNewOrderData(dataPack)
         totoalNumbers += int(dataPack.numbers)
         totoalNumbersOfPack += int(dataPack.numbersOfPack)
@@ -133,12 +138,19 @@ def importDataFromGoogleSpread():
         else:
             totoalNumbersOf2_nameStr = ''
 
+    # Summary includes both
+    pickupNumbers = sum(int(o.numbers) for o in pickup_orders)
+    totalAll = totoalNumbers + pickupNumbers
+
     retDict = {"isSuccess": True,
                "data": Controls.getOrderData(),
                "totoalNumbers": "==&nbsp{} 出貨總整理&nbsp==<br>"
-                          "總件數:{}&nbsp&nbsp總箱數：{}<br>"
+                          "宅配：{} 箱&nbsp&nbsp|&nbsp&nbsp自取：{} 箱&nbsp&nbsp|&nbsp&nbsp"
+                          "<b>總共：{} 箱</b><br>"
+                          "宅配件數:{}&nbsp&nbsp宅配箱數：{}<br>"
                           "兩箱件數：{} <br>"
                           "{}<br>".format(strShippingDate[5:],
+                                                    totoalNumbers, pickupNumbers, totalAll,
                                                     totoalNumbersOfPack, totoalNumbers,
                                                     totoalNumbersOf2, totoalNumbersOf2_nameStr
                                                     ),
@@ -164,6 +176,7 @@ def api_all_orders():
         d['exported'] = getattr(dp, '_exported', False)
         d['exportedAt'] = getattr(dp, '_exportedAt', '')
         d['paid'] = getattr(dp, '_paid', False)
+        d['deliveryType'] = dp.deliveryTypeFormat
         all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
 
