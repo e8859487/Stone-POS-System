@@ -150,6 +150,7 @@ class DataPack(object):
         dp._source = d.get('source', '')
         dp._exported = d.get('exported', False)
         dp._exportedAt = d.get('exportedAt', '')
+        dp._paid = d.get('paid', False)
         return dp
 
     def toGoogleSpreadSheetFormat(self):

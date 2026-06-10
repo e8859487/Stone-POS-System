@@ -22,6 +22,7 @@
                 <th>付款方式</th>
                 <th>備註</th>
                 <th>來源</th>
+                <th>已收款</th>
                 <th>匯出狀態</th>
                 <th>操作</th>
             </tr>
@@ -118,6 +119,7 @@ function renderTable() {
             "<td>" + (o.paymentMethod || "") + "</td>" +
             "<td>" + (o.userComment || "") + "</td>" +
             "<td>" + (o.source || "") + "</td>" +
+            '<td><input type="checkbox" class="form-check-input chk-paid" data-idx="' + i + '"' + (o.paid ? ' checked' : '') + '></td>' +
             "<td>" + (o.exported ? '<span style="color:green">✓ ' + (o.exportedAt || '已匯出') + '</span>' : '') + "</td>" +
             '<td>' +
                 '<button class="btn btn-sm btn-outline-primary me-1 btn-edit" data-idx="' + i + '">編輯</button>' +
@@ -198,6 +200,24 @@ $(document).on("click", ".btn-delete", function() {
             }
         },
         error: function() { alert("刪除失敗"); }
+    });
+});
+
+// Toggle paid
+$(document).on("change", ".chk-paid", function() {
+    var idx = $(this).data("idx");
+    var o = _allOrders[idx];
+    var paid = $(this).is(":checked");
+    $.ajax({
+        url: "api_togglePaid",
+        type: "post",
+        contentType: "application/json",
+        data: JSON.stringify({ id: o.id, paid: paid }),
+        dataType: "json",
+        success: function(data) {
+            if (!data.isSuccess) alert("更新失敗：" + data.msg);
+        },
+        error: function() { alert("更新失敗"); }
     });
 });
 

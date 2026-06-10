@@ -163,6 +163,7 @@ def api_all_orders():
         d['source'] = getattr(dp, '_source', '')
         d['exported'] = getattr(dp, '_exported', False)
         d['exportedAt'] = getattr(dp, '_exportedAt', '')
+        d['paid'] = getattr(dp, '_paid', False)
         all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
 
@@ -191,6 +192,21 @@ def api_mark_exported():
     try:
         count = repo.mark_orders_exported(shipping_date)
         return jsonify({"isSuccess": True, "msg": "已標記 {} 筆為已匯出".format(count)})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
+
+@app.route('/api_togglePaid', methods=['POST'])
+def api_toggle_paid():
+    data = flask.request.get_json()
+    order_id = data.get('id')
+    paid = data.get('paid', False)
+    if not order_id:
+        return jsonify({"isSuccess": False, "msg": "缺少訂單 ID"})
+    repo = get_repository()
+    try:
+        from firestore_repository import firestore as fs
+        repo.collection.document(order_id).update({'paid': paid})
+        return jsonify({"isSuccess": True})
     except Exception as e:
         return jsonify({"isSuccess": False, "msg": str(e)})
 
