@@ -57,6 +57,25 @@ $(function() {
         showFixContentColumns()
         $("table").first().table2csv(options); // default action is 'download'
         hideFixContentColumns()
+
+        // Mark orders as exported
+        var rawDate = $('#GoogleSpreadShippingDate-input > input').val();
+        if (rawDate) {
+            var d = new Date(rawDate);
+            var shippingDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+            $.ajax({
+                url: "api_markExported",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify({ shippingDate: shippingDate }),
+                dataType: "json",
+                success: function(data) {
+                    if (data.isSuccess) {
+                        $("#totoalNumbers").append("<br><span style='color:green'>✓ " + data.msg + "</span>");
+                    }
+                }
+            });
+        }
     });
 
     $( "#test" ).on( "click", function() {

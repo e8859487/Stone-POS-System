@@ -71,3 +71,14 @@ class FirestoreRepository(DataRepository):
     def delete_order(self, order_id):
         self.collection.document(order_id).delete()
         return True
+
+    def mark_orders_exported(self, shipping_date_str):
+        import datetime
+        query = self.collection.where('shippingDate', '==', shipping_date_str)
+        docs = query.stream()
+        count = 0
+        now = datetime.datetime.now().strftime('%Y/%m/%d %H:%M')
+        for doc in docs:
+            doc.reference.update({'exported': True, 'exportedAt': now})
+            count += 1
+        return count

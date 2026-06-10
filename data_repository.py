@@ -24,3 +24,7 @@ class DataRepository:
     def delete_order(self, order_id):
         """Delete an order. Returns True on success."""
         raise NotImplementedError
+
+    def mark_orders_exported(self, shipping_date_str):
+        """Mark all orders for a shipping date as exported. Returns count."""
+        raise NotImplementedError

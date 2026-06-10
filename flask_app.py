@@ -161,6 +161,8 @@ def api_all_orders():
         d['arrivalTime'] = dp.arrivalTimeFormat
         d['paymentMethod'] = dp.paymentMethodFormat
         d['source'] = getattr(dp, '_source', '')
+        d['exported'] = getattr(dp, '_exported', False)
+        d['exportedAt'] = getattr(dp, '_exportedAt', '')
         all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
 
@@ -176,6 +178,19 @@ def api_update_order():
     try:
         repo.update_order(order_id, dp)
         return jsonify({"isSuccess": True, "msg": "更新成功"})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
+
+@app.route('/api_markExported', methods=['POST'])
+def api_mark_exported():
+    data = flask.request.get_json()
+    shipping_date = data.get('shippingDate')
+    if not shipping_date:
+        return jsonify({"isSuccess": False, "msg": "缺少出貨日期"})
+    repo = get_repository()
+    try:
+        count = repo.mark_orders_exported(shipping_date)
+        return jsonify({"isSuccess": True, "msg": "已標記 {} 筆為已匯出".format(count)})
     except Exception as e:
         return jsonify({"isSuccess": False, "msg": str(e)})
 

@@ -22,6 +22,7 @@
                 <th>付款方式</th>
                 <th>備註</th>
                 <th>來源</th>
+                <th>匯出狀態</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -117,6 +118,7 @@ function renderTable() {
             "<td>" + (o.paymentMethod || "") + "</td>" +
             "<td>" + (o.userComment || "") + "</td>" +
             "<td>" + (o.source || "") + "</td>" +
+            "<td>" + (o.exported ? '<span style="color:green">✓ ' + (o.exportedAt || '已匯出') + '</span>' : '') + "</td>" +
             '<td>' +
                 '<button class="btn btn-sm btn-outline-primary me-1 btn-edit" data-idx="' + i + '">編輯</button>' +
                 '<button class="btn btn-sm btn-outline-danger btn-delete" data-idx="' + i + '">刪除</button>' +

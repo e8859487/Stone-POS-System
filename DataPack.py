@@ -148,6 +148,8 @@ class DataPack(object):
         dp.userComment = d.get('userComment', '')
         dp.googleComment = d.get('googleComment', '')
         dp._source = d.get('source', '')
+        dp._exported = d.get('exported', False)
+        dp._exportedAt = d.get('exportedAt', '')
         return dp
 
     def toGoogleSpreadSheetFormat(self):
