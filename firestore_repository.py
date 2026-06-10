@@ -53,7 +53,8 @@ class FirestoreRepository(DataRepository):
         return sorted(dates, key=lambda d: tuple(map(int, d.split('/'))))
 
     def get_all_orders(self):
-        docs = self.collection.stream()
+        query = self.collection.order_by('timestamp', direction=firestore.Query.DESCENDING)
+        docs = query.stream()
         orders = []
         for doc in docs:
             dp = DataPack.from_firestore_dict(doc.to_dict())
