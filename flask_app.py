@@ -122,6 +122,12 @@ def importDataFromGoogleSpread():
     totoalNumbersOf2 = 0
     totoalNumbersOf2_name = ["&nbsp&nbsp-"]
     for dataPack in delivery_orders:
+        if int(dataPack.numbers) == 2:
+            suffix = " ⬛ 2 箱 ⬛"
+            if dataPack.userComment:
+                dataPack.userComment += suffix
+            else:
+                dataPack.userComment = suffix.strip()
         Controls.addNewOrderData(dataPack)
         totoalNumbers += int(dataPack.numbers)
         totoalNumbersOfPack += int(dataPack.numbersOfPack)
