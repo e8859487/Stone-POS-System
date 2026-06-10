@@ -262,18 +262,24 @@ $( "#imageUpload" ).on( "change", function(){
 });
 
 $( "#btnAddNewOrder" ).on( "click", function(){
-        if($("#name-input").val() == "" ){
-            alert("請輸入姓名")
-            return
-        }
+        var isSelfPickup = $("input[name='deliveryType-input']:checked").val() == "自取";
 
-        if($("#address-input").val() == "" )
-        {
-            alert("請輸入地址")
-            return
+        if (!isSelfPickup) {
+            if($("#name-input").val() == "" ){
+                alert("請輸入姓名")
+                return
+            }
+            if($("#address-input").val() == "" ){
+                alert("請輸入地址")
+                return
+            }
+            if($("#phone-input").val() == "" && $("#mPhone-input").val() == ""){
+                alert("請輸入電話")
+                return
+            }
         }
-        if($("#phone-input").val() == "" && $("#mPhone-input").val() == ""){
-            alert("請輸入電話")
+        if($("#numbers-input").val() == "" || $("#numbers-input").val() == "0"){
+            alert("請輸入數量")
             return
         }
 
