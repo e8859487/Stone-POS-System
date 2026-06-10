@@ -3,12 +3,16 @@
     <button id="refreshOrders" class="btn btn-outline-secondary btn-sm">重新整理</button>
 </div>
 
-<div id="orderSummary" class="mb-3 d-flex align-items-center">
-    <label class="me-2">到貨日期：</label>
+<div id="orderSummary" class="mb-3 d-flex align-items-center flex-wrap" style="gap:8px;">
+    <label>出貨日期：</label>
+    <select id="filterShippingDate" class="form-select form-select-sm" style="width:auto;">
+        <option value="">全部</option>
+    </select>
+    <label class="ms-2">到貨日期：</label>
     <select id="filterArrivalDate" class="form-select form-select-sm" style="width:auto;">
         <option value="">全部</option>
     </select>
-    <span class="badge bg-secondary ms-3" id="totalCount">載入中...</span>
+    <span class="badge bg-secondary ms-2" id="totalCount">載入中...</span>
 </div>
 
 <div class="table-responsive">
@@ -107,25 +111,36 @@ function loadAllOrders() {
 }
 
 function buildDateFilter() {
-    var dates = {};
+    var arrDates = {}, shipDates = {};
     for (var i = 0; i < _allOrders.length; i++) {
-        var d = _allOrders[i].arrivalDate || "";
-        if (d) dates[d] = true;
+        var a = _allOrders[i].arrivalDate || "";
+        var s = _allOrders[i].shippingDate || "";
+        if (a) arrDates[a] = true;
+        if (s) shipDates[s] = true;
     }
-    var sel = $("#filterArrivalDate");
-    var current = sel.val();
-    sel.find("option:not(:first)").remove();
+    fillSelect("#filterArrivalDate", arrDates);
+    fillSelect("#filterShippingDate", shipDates);
+}
+
+function fillSelect(sel, dates) {
+    var $sel = $(sel);
+    var current = $sel.val();
+    $sel.find("option:not(:first)").remove();
     var sorted = Object.keys(dates).sort();
     for (var j = 0; j < sorted.length; j++) {
-        sel.append('<option value="' + sorted[j] + '">' + sorted[j] + '</option>');
+        $sel.append('<option value="' + sorted[j] + '">' + sorted[j] + '</option>');
     }
-    if (current) sel.val(current);
+    if (current) $sel.val(current);
 }
 
 function getFilteredOrders() {
-    var filter = $("#filterArrivalDate").val();
-    if (!filter) return _allOrders;
-    return _allOrders.filter(function(o) { return o.arrivalDate === filter; });
+    var arrFilter = $("#filterArrivalDate").val();
+    var shipFilter = $("#filterShippingDate").val();
+    return _allOrders.filter(function(o) {
+        if (arrFilter && o.arrivalDate !== arrFilter) return false;
+        if (shipFilter && o.shippingDate !== shipFilter) return false;
+        return true;
+    });
 }
 
 function renderTable() {
@@ -253,6 +268,7 @@ $(document).on("change", ".chk-paid", function() {
 loadAllOrders();
 $("#refreshOrders").on("click", loadAllOrders);
 $("#filterArrivalDate").on("change", renderTable);
+$("#filterShippingDate").on("change", renderTable);
 
 }); // end window.addEventListener
 </script>
