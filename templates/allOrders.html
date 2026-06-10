@@ -12,6 +12,12 @@
     <select id="filterArrivalDate" class="form-select form-select-sm" style="width:auto;">
         <option value="">全部</option>
     </select>
+    <label class="ms-2">匯出狀態：</label>
+    <select id="filterExported" class="form-select form-select-sm" style="width:auto;">
+        <option value="">全部</option>
+        <option value="yes">已匯出</option>
+        <option value="no">未匯出</option>
+    </select>
     <span class="badge bg-secondary ms-2" id="totalCount">載入中...</span>
 </div>
 
@@ -145,9 +151,12 @@ function fillSelect(sel, dates) {
 function getFilteredOrders() {
     var arrFilter = $("#filterArrivalDate").val();
     var shipFilter = $("#filterShippingDate").val();
+    var expFilter = $("#filterExported").val();
     return _allOrders.filter(function(o) {
         if (arrFilter && o.arrivalDate !== arrFilter) return false;
         if (shipFilter && o.shippingDate !== shipFilter) return false;
+        if (expFilter === "yes" && !o.exported) return false;
+        if (expFilter === "no" && o.exported) return false;
         return true;
     });
 }
@@ -281,6 +290,7 @@ loadAllOrders();
 $("#refreshOrders").on("click", loadAllOrders);
 $("#filterArrivalDate").on("change", renderTable);
 $("#filterShippingDate").on("change", renderTable);
+$("#filterExported").on("change", renderTable);
 
 }); // end window.addEventListener
 </script>
