@@ -125,7 +125,7 @@ def importDataFromGoogleSpread():
         if int(dataPack.numbers) == 2:
             suffix = "    ⬛ 2 箱 ⬛"
             if dataPack.userComment:
-                dataPack.userComment += suffix
+                dataPack.userComment += "。" + suffix
             else:
                 dataPack.userComment = suffix.strip()
         Controls.addNewOrderData(dataPack)
