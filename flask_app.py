@@ -123,7 +123,7 @@ def importDataFromGoogleSpread():
     totoalNumbersOf2_name = ["&nbsp&nbsp-"]
     for dataPack in delivery_orders:
         if int(dataPack.numbers) == 2:
-            suffix = " ⬛ 2 箱 ⬛"
+            suffix = "\t⬛ 2 箱 ⬛"
             if dataPack.userComment:
                 dataPack.userComment += suffix
             else:
