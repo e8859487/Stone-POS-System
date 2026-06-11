@@ -13,7 +13,7 @@ SCOPES = [GlobalSettings.Scopes]
 
 SPREADSHEET_ID = GlobalSettings.SPREADSHEET_ID
 SAMPLE_RANGE_NAME = 'A1:AA1000'
-SHEET_RESPONSE_RANGE = '表單回應 1!A1:R999'  # filled by customers
+SHEET_RESPONSE_RANGE = '表單回覆 1!A1:R999'  # filled by customers
 AUTO_FILL_TABLE_NAME = '全自動資料表'
 WEBSITE_RESPONSE_RANGE = '{}!A1:R208'.format(AUTO_FILL_TABLE_NAME)  # filled from website
 
