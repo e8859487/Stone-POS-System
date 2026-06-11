@@ -102,6 +102,25 @@
   </div>
 </div>
 
+<!-- New Data Notification Modal -->
+<div class="modal fade" id="newDataModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Google 表單通知</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="newDataMsg"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">稍後再說</button>
+        <button type="button" class="btn btn-success btn-sm" id="openImportFromNotify">開啟匯入預覽</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Import Preview Modal -->
 <div class="modal fade" id="importPreviewModal" tabindex="-1">
   <div class="modal-dialog modal-xl">
@@ -361,29 +380,7 @@ $("#importGoogleForm").on("click", function() {
             if (data.newOrders.length === 0 && data.rejectedOrders.length === 0) {
                 alert("沒有新訂單可匯入（全部已存在）"); return;
             }
-            $("#importPreviewMsg").text(data.msg);
-
-            // New orders section
-            var newBody = $("#importNewBody").empty();
-            for (var i = 0; i < data.newOrders.length; i++) {
-                newBody.append(renderImportRow(data.newOrders[i], true));
-            }
-            $("#checkAllNew").prop("checked", true);
-
-            // Rejected orders section
-            var rejBody = $("#importRejectedBody").empty();
-            if (data.rejectedOrders.length > 0) {
-                for (var j = 0; j < data.rejectedOrders.length; j++) {
-                    rejBody.append(renderImportRow(data.rejectedOrders[j], false));
-                }
-                $("#rejectedSection").show();
-                $("#checkAllRejected").prop("checked", false);
-            } else {
-                $("#rejectedSection").hide();
-            }
-
-            var modal = new bootstrap.Modal(document.getElementById("importPreviewModal"));
-            modal.show();
+            showImportPreview(data);
         },
         error: function() {
             btn.prop("disabled", false).text("從 Google 表單匯入");
@@ -433,7 +430,62 @@ $("#confirmImport").on("click", function() {
     });
 });
 
+// Auto-check Google Form for new data on page load
+var _cachedPreviewData = null;
+
+function checkNewGoogleFormData() {
+    $.ajax({
+        url: "api_previewGoogleFormImport",
+        type: "post",
+        contentType: "application/json",
+        data: "{}",
+        dataType: "json",
+        success: function(data) {
+            if (!data.isSuccess) return;
+            if (data.newOrders.length === 0) return;
+            _cachedPreviewData = data;
+            $("#newDataMsg").text("Google 表單有 " + data.newOrders.length + " 筆新訂單尚未匯入。");
+            var modal = new bootstrap.Modal(document.getElementById("newDataModal"));
+            modal.show();
+        }
+    });
+}
+
+$("#openImportFromNotify").on("click", function() {
+    var el = document.getElementById("newDataModal");
+    var data = _cachedPreviewData;
+    if (!data) return;
+    _cachedPreviewData = null;
+    el.addEventListener("hidden.bs.modal", function handler() {
+        el.removeEventListener("hidden.bs.modal", handler);
+        showImportPreview(data);
+    });
+    bootstrap.Modal.getInstance(el).hide();
+});
+
+function showImportPreview(data) {
+    $("#importPreviewMsg").text(data.msg);
+    var newBody = $("#importNewBody").empty();
+    for (var i = 0; i < data.newOrders.length; i++) {
+        newBody.append(renderImportRow(data.newOrders[i], true));
+    }
+    $("#checkAllNew").prop("checked", true);
+    var rejBody = $("#importRejectedBody").empty();
+    if (data.rejectedOrders.length > 0) {
+        for (var j = 0; j < data.rejectedOrders.length; j++) {
+            rejBody.append(renderImportRow(data.rejectedOrders[j], false));
+        }
+        $("#rejectedSection").show();
+        $("#checkAllRejected").prop("checked", false);
+    } else {
+        $("#rejectedSection").hide();
+    }
+    var modal = new bootstrap.Modal(document.getElementById("importPreviewModal"));
+    modal.show();
+}
+
 loadAllOrders();
+checkNewGoogleFormData();
 $("#refreshOrders").on("click", loadAllOrders);
 $("#filterArrivalDate").on("change", renderTable);
 $("#filterShippingDate").on("change", renderTable);
