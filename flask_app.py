@@ -188,6 +188,12 @@ def _get_importable_orders():
         existing_keys.add(key)
 
     parser = GoogleSpreadDataParser()
+    # Only use columns that exist in this sheet
+    available_cols = [c for c in GoogleSpreadDataParser.interestColumn if c in raw.columns]
+    # Pad missing columns with empty strings
+    for col in GoogleSpreadDataParser.interestColumn:
+        if col not in raw.columns:
+            raw[col] = ""
     new_orders = []
     for row in raw[GoogleSpreadDataParser.interestColumn].iterrows():
         try:
