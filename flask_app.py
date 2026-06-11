@@ -168,8 +168,27 @@ def all_orders():
     orderedDoc = render_template('allOrders.html')
     return render_template('index.html', table=orderedDoc, NavIndex=5)
 
-def _get_importable_orders():
-    """Parse Google Form data and return new (non-duplicate) orders as dicts."""
+def _make_order_key(o):
+    return "{}|{}|{}".format(o.get('name', ''), o.get('arrivalDate', ''), o.get('numbers', ''))
+
+def _get_rejected_keys():
+    """Get set of previously rejected import keys from Firestore."""
+    repo = get_repository()
+    try:
+        doc = repo.db.collection('metadata').document('rejected_imports').get()
+        if doc.exists:
+            return set(doc.to_dict().get('keys', []))
+    except Exception:
+        pass
+    return set()
+
+def _save_rejected_keys(keys):
+    """Save rejected import keys to Firestore."""
+    repo = get_repository()
+    repo.db.collection('metadata').document('rejected_imports').set({'keys': list(keys)})
+
+def _parse_form_orders():
+    """Parse Google Form data and return non-duplicate orders as dicts."""
     from ReadGoogleExcel import getFormResponseData, initService
     from DataParser import GoogleSpreadDataParser
 
@@ -188,13 +207,11 @@ def _get_importable_orders():
         existing_keys.add(key)
 
     parser = GoogleSpreadDataParser()
-    # Only use columns that exist in this sheet
-    available_cols = [c for c in GoogleSpreadDataParser.interestColumn if c in raw.columns]
-    # Pad missing columns with empty strings
     for col in GoogleSpreadDataParser.interestColumn:
         if col not in raw.columns:
             raw[col] = ""
-    new_orders = []
+
+    all_new = []
     for row in raw[GoogleSpreadDataParser.interestColumn].iterrows():
         try:
             parser.setData(row)
@@ -205,7 +222,8 @@ def _get_importable_orders():
             if key in existing_keys:
                 continue
             existing_keys.add(key)
-            new_orders.append({
+            all_new.append({
+                "key": key,
                 "name": dp.name or "",
                 "address": dp.address or "",
                 "phone": dp.phone or "",
@@ -218,23 +236,43 @@ def _get_importable_orders():
             })
         except Exception:
             continue
-    return new_orders, None
+    return all_new, None
 
 @app.route('/api_previewGoogleFormImport', methods=['POST'])
 def api_preview_google_form_import():
     try:
-        orders, err = _get_importable_orders()
+        orders, err = _parse_form_orders()
         if err:
             return jsonify({"isSuccess": False, "msg": err})
-        return jsonify({"isSuccess": True, "orders": orders,
-                        "msg": "找到 {} 筆新訂單可匯入".format(len(orders))})
+
+        rejected_keys = _get_rejected_keys()
+        new_orders = [o for o in orders if o['key'] not in rejected_keys]
+        rejected_orders = [o for o in orders if o['key'] in rejected_keys]
+
+        return jsonify({"isSuccess": True,
+                        "newOrders": new_orders,
+                        "rejectedOrders": rejected_orders,
+                        "msg": "新訂單 {} 筆，曾排除 {} 筆".format(len(new_orders), len(rejected_orders))})
     except Exception as e:
         return jsonify({"isSuccess": False, "msg": str(e)})
 
 @app.route('/api_importFromGoogleForm', methods=['POST'])
 def api_import_from_google_form():
     try:
-        orders, err = _get_importable_orders()
+        data = flask.request.get_json()
+        import_keys = set(data.get('importKeys', []))
+        reject_keys = set(data.get('rejectKeys', []))
+
+        # Save rejected keys
+        existing_rejected = _get_rejected_keys()
+        # Add new rejects, remove un-rejected ones
+        updated_rejected = (existing_rejected | reject_keys) - import_keys
+        _save_rejected_keys(updated_rejected)
+
+        if not import_keys:
+            return jsonify({"isSuccess": True, "msg": "沒有選擇要匯入的訂單"})
+
+        orders, err = _parse_form_orders()
         if err:
             return jsonify({"isSuccess": False, "msg": err})
 
@@ -242,9 +280,10 @@ def api_import_from_google_form():
         repo = get_repository()
         imported = 0
         for o in orders:
-            dp = DataPack.from_firestore_dict(o)
-            repo.add_order(dp, source="google_form")
-            imported += 1
+            if o['key'] in import_keys:
+                dp = DataPack.from_firestore_dict(o)
+                repo.add_order(dp, source="google_form")
+                imported += 1
 
         return jsonify({"isSuccess": True,
                         "msg": "成功匯入 {} 筆訂單".format(imported)})
