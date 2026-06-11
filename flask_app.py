@@ -168,6 +168,54 @@ def all_orders():
     orderedDoc = render_template('allOrders.html')
     return render_template('index.html', table=orderedDoc, NavIndex=5)
 
+@app.route('/api_importFromGoogleForm', methods=['POST'])
+def api_import_from_google_form():
+    try:
+        from ReadGoogleExcel import getFormResponseData, initService
+        from DataParser import GoogleSpreadDataParser
+        from DataPack import DELIVERYTYPE_HOME_DELIVERY
+
+        if not initService():
+            return jsonify({"isSuccess": False, "msg": "Google Sheets 連線失敗"})
+
+        raw = getFormResponseData()
+        if raw is None or raw.empty:
+            return jsonify({"isSuccess": False, "msg": "表單回應無資料"})
+
+        # Get existing orders to detect duplicates
+        repo = get_repository()
+        existing = repo.get_all_orders()
+        existing_keys = set()
+        for dp in existing:
+            key = "{}|{}|{}".format(dp.name, dp.arrivalDate, dp.numbers)
+            existing_keys.add(key)
+
+        parser = GoogleSpreadDataParser()
+        imported = 0
+        skipped = 0
+        for row in raw[GoogleSpreadDataParser.interestColumn].iterrows():
+            try:
+                parser.setData(row)
+                dp = parser.parse()
+                if not dp.name:
+                    skipped += 1
+                    continue
+                # Duplicate check
+                key = "{}|{}|{}".format(dp.name, dp.arrivalDate, dp.numbers)
+                if key in existing_keys:
+                    skipped += 1
+                    continue
+                repo.add_order(dp, source="google_form")
+                existing_keys.add(key)
+                imported += 1
+            except Exception as e:
+                skipped += 1
+
+        return jsonify({"isSuccess": True,
+                        "msg": "匯入 {} 筆，跳過 {} 筆（重複或無效）".format(imported, skipped)})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
+
 @app.route('/api_allOrders')
 def api_all_orders():
     repo = get_repository()

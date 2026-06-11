@@ -1,6 +1,9 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h4>所有訂單全覽</h4>
-    <button id="refreshOrders" class="btn btn-outline-secondary btn-sm">重新整理</button>
+    <div>
+        <button id="importGoogleForm" class="btn btn-outline-success btn-sm me-2">從 Google 表單匯入</button>
+        <button id="refreshOrders" class="btn btn-outline-secondary btn-sm">重新整理</button>
+    </div>
 </div>
 
 <div id="orderSummary" class="mb-3 d-flex align-items-center flex-wrap" style="gap:8px;">
@@ -283,6 +286,29 @@ $(document).on("change", ".chk-paid", function() {
             if (!data.isSuccess) alert("更新失敗：" + data.msg);
         },
         error: function() { alert("更新失敗"); }
+    });
+});
+
+// Import from Google Form
+$("#importGoogleForm").on("click", function() {
+    if (!confirm("確定從 Google 表單匯入訂單？（已匯入過的會自動跳過）")) return;
+    var btn = $(this);
+    btn.prop("disabled", true).text("匯入中...");
+    $.ajax({
+        url: "api_importFromGoogleForm",
+        type: "post",
+        contentType: "application/json",
+        data: "{}",
+        dataType: "json",
+        success: function(data) {
+            btn.prop("disabled", false).text("從 Google 表單匯入");
+            alert(data.msg);
+            if (data.isSuccess) loadAllOrders();
+        },
+        error: function() {
+            btn.prop("disabled", false).text("從 Google 表單匯入");
+            alert("匯入失敗");
+        }
     });
 });
 

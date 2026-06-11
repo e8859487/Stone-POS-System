@@ -129,6 +129,23 @@ def getSpreadSheetData():
             s.append("")
     return pd.DataFrame(spreadSheetData[1:], columns=spreadSheetData[0])
 
+def getFormResponseData():
+    """Read data from '表單回應 1' sheet."""
+    global service
+    if not initService():
+        return None
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                range=SHEET_RESPONSE_RANGE).execute()
+    values = result.get('values', [])
+    if len(values) < 2:
+        return pd.DataFrame()
+    # pad rows
+    for s in values[1:]:
+        while len(s) < len(values[0]):
+            s.append("")
+    return pd.DataFrame(values[1:], columns=values[0])
+
 def getSpreadSheetDataUniteDates():
     spreadSheetData = querySpreadSheetData()
     dateSets = set()
