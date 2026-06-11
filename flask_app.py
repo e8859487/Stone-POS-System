@@ -187,6 +187,24 @@ def _save_rejected_keys(keys):
     repo = get_repository()
     repo.db.collection('metadata').document('rejected_imports').set({'keys': list(keys)})
 
+def _normalize_date(date_str):
+    """Normalize date to yyyy/m/d for consistent key comparison."""
+    if not date_str:
+        return ""
+    import datetime as _dt
+    try:
+        d = _dt.datetime.strptime(date_str.replace('-', '/'), "%Y/%m/%d")
+        return '{}/{}/{}'.format(d.year, d.month, d.day)
+    except ValueError:
+        return date_str
+
+def _order_key(name, arrival_date, numbers):
+    return "{}|{}|{}".format(
+        (name or "").strip(),
+        _normalize_date(arrival_date),
+        int(float(numbers)) if numbers else 0
+    )
+
 def _parse_form_orders():
     """Parse Google Form data and return non-duplicate orders as dicts."""
     from ReadGoogleExcel import getFormResponseData, initService
@@ -203,7 +221,7 @@ def _parse_form_orders():
     existing = repo.get_all_orders()
     existing_keys = set()
     for dp in existing:
-        key = "{}|{}|{}".format(dp.name, dp.arrivalDate, dp.numbers)
+        key = _order_key(dp.name, dp.arrivalDate, dp.numbers)
         existing_keys.add(key)
 
     parser = GoogleSpreadDataParser()
@@ -218,7 +236,7 @@ def _parse_form_orders():
             dp = parser.parse()
             if not dp.name:
                 continue
-            key = "{}|{}|{}".format(dp.name, dp.arrivalDate, dp.numbers)
+            key = _order_key(dp.name, dp.arrivalDate, dp.numbers)
             if key in existing_keys:
                 continue
             existing_keys.add(key)
