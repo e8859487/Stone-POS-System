@@ -157,6 +157,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-outline-warning" id="ignoreOrders">忽略未勾選訂單</button>
         <button type="button" class="btn btn-success" id="confirmImport">確認匯入勾選項目</button>
       </div>
     </div>
@@ -426,6 +427,38 @@ $("#confirmImport").on("click", function() {
         error: function() {
             btn.prop("disabled", false).text("確認匯入勾選項目");
             alert("匯入失敗");
+        }
+    });
+});
+
+// Ignore: mark unchecked new orders as rejected
+$("#ignoreOrders").on("click", function() {
+    var rejectKeys = [];
+    $("#importNewBody .import-chk").each(function() {
+        if (!$(this).is(":checked")) {
+            rejectKeys.push($(this).data("key"));
+        }
+    });
+    if (rejectKeys.length === 0) {
+        alert("請先取消勾選要忽略的訂單"); return;
+    }
+    if (!confirm("確定忽略 " + rejectKeys.length + " 筆訂單？")) return;
+    var btn = $(this);
+    btn.prop("disabled", true).text("處理中...");
+    $.ajax({
+        url: "api_importFromGoogleForm",
+        type: "post",
+        contentType: "application/json",
+        data: JSON.stringify({ importKeys: [], rejectKeys: rejectKeys }),
+        dataType: "json",
+        success: function(data) {
+            btn.prop("disabled", false).text("忽略未勾選訂單");
+            bootstrap.Modal.getInstance(document.getElementById("importPreviewModal")).hide();
+            alert("已忽略 " + rejectKeys.length + " 筆訂單");
+        },
+        error: function() {
+            btn.prop("disabled", false).text("忽略未勾選訂單");
+            alert("操作失敗");
         }
     });
 });
