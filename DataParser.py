@@ -213,10 +213,12 @@ class GoogleSpreadDataParser(ParserBase):
     def getShippingDate(self):
         import datetime
         shippingDate = datetime.datetime.strptime(self.dt[1][1], "%Y/%m/%d") - datetime.timedelta(days=1)
-        return shippingDate.strftime("%Y/%m/%d")
+        return '{dt.year}/{dt.month}/{dt.day}'.format(dt=shippingDate)
 
     def getArrivalDate(self):
-        return self.dt[1][1]
+        import datetime
+        arrivalDate = datetime.datetime.strptime(self.dt[1][1], "%Y/%m/%d")
+        return '{dt.year}/{dt.month}/{dt.day}'.format(dt=arrivalDate)
 
     def getArrivalTime(self):
         if self.dt[1][2] == "下午":
