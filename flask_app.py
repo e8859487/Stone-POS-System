@@ -324,7 +324,7 @@ def api_all_orders():
         d['paid'] = getattr(dp, '_paid', False)
         d['deliveryType'] = dp.deliveryTypeFormat
         ts = getattr(dp, '_timestamp', None)
-        d['submittedAt'] = ts.strftime('%Y/%m/%d') if ts else ''
+        d['submittedAt'] = ts.strftime('%Y/%m/%d %H:%M') if ts else ''
         all_orders.append(d)
     return jsonify({"isSuccess": True, "orders": all_orders})
 
