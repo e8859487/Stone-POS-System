@@ -74,6 +74,31 @@ class FirestoreRepository(DataRepository):
         self.collection.document(order_id).delete()
         return True
 
+    def get_shipping_date_summary(self):
+        import datetime
+        today = datetime.date.today()
+        docs = self.collection.stream()
+        summary = {}
+        for doc in docs:
+            d = doc.to_dict()
+            if d.get('exported', False):
+                continue
+            sd = d.get('shippingDate', '').replace('-', '/')
+            if not sd:
+                continue
+            try:
+                parts = sd.split('/')
+                date = datetime.date(int(parts[0]), int(parts[1]), int(parts[2]))
+            except (ValueError, IndexError):
+                continue
+            if date < today:
+                continue
+            summary[sd] = summary.get(sd, 0) + int(d.get('numbers', 0))
+        return sorted(
+            [{'date': k, 'total_boxes': v} for k, v in summary.items()],
+            key=lambda x: tuple(map(int, x['date'].split('/')))
+        )
+
     def mark_orders_exported(self, shipping_date_str):
         import datetime
         query = self.collection.where('shippingDate', '==', shipping_date_str)

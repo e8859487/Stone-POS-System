@@ -391,8 +391,9 @@ def show_orders():
         Controls.clearOrderData()
     repo = get_repository()
     OrderDateList = repo.get_available_shipping_dates()
-    orderedDoc = render_template('showOrders.html', message=message )
-    SubPageJS = render_template('partial_showOrder.js', orderDates=OrderDateList )
+    date_summary = repo.get_shipping_date_summary()
+    orderedDoc = render_template('showOrders.html', message=message, date_summary=date_summary)
+    SubPageJS = render_template('partial_showOrder.js', orderDates=OrderDateList)
     return render_template('index.html', table=orderedDoc, NavIndex=1, SubPageJS=SubPageJS)
 
 @app.route('/new_orders', methods=['GET', 'POST'])

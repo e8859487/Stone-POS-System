@@ -28,3 +28,7 @@ class DataRepository:
     def mark_orders_exported(self, shipping_date_str):
         """Mark all orders for a shipping date as exported. Returns count."""
         raise NotImplementedError
+
+    def get_shipping_date_summary(self):
+        """Returns list of {date, total_boxes} for future non-exported dates, sorted by date."""
+        raise NotImplementedError
