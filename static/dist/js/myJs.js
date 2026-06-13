@@ -144,10 +144,6 @@ $(function() {
         queryGoogleSpreadData()
      });
 
-   $( "#importDataFromGoogleSpread" ).on( "click", function() {
-        queryGoogleSpreadData()
-    });
-
  $( "#btnPreviewData" ).on( "click", function(){
         var form= new FormData(document.getElementById("orderForm"));
         $.ajax({
