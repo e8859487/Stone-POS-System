@@ -398,11 +398,11 @@ def show_orders():
 @app.route('/new_orders', methods=['GET', 'POST'])
 def new_orders():
     orderedDoc = render_template('newOrders.html')
-    return render_template('index.html', table=orderedDoc, NavIndex=2)
+    return render_template('index.html', table=orderedDoc, NavIndex=3)
 
 @app.route('/Others')
 def Others():
-    return render_template('index.html', table=print_sample(), NavIndex=3)
+    return render_template('index.html', table=print_sample(), NavIndex=4)
 
 
 
