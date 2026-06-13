@@ -40,6 +40,7 @@ class DataPack(object):
         self.deliveryType = DELIVERYTYPE_HOME_DELIVERY  # 宅配 1 / 自取 2
         self.userComment = ''
         self.googleComment = ''
+        self.bankCode = ''
 
     @property
     def arrivalTimeFormat(self):
@@ -116,7 +117,8 @@ class DataPack(object):
             "userComment": self.userComment,
             "paymentMethod": self.paymentMethod,
             "arrivalTime": self.arrivalTime,
-            "deliveryType": self.deliveryType
+            "deliveryType": self.deliveryType,
+            "bankCode": self.bankCode
         }
 
     def toFirestoreDict(self, source="web"):
@@ -135,6 +137,7 @@ class DataPack(object):
             "shippingDate": self.shippingDate or "",
             "deliveryType": self.deliveryTypeFormat,
             "source": source,
+            "bankCode": self.bankCode or "",
         }
 
     @classmethod
@@ -161,6 +164,7 @@ class DataPack(object):
                            else DELIVERYTYPE_HOME_DELIVERY)
         dp.userComment = d.get('userComment', '')
         dp.googleComment = d.get('googleComment', '')
+        dp.bankCode = d.get('bankCode', '')
         dp._source = d.get('source', '')
         dp._exported = d.get('exported', False)
         dp._exportedAt = d.get('exportedAt', '')

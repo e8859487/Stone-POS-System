@@ -1,3 +1,17 @@
+<style>
+#allOrdersTable.hide-col-2  th:nth-child(2),  #allOrdersTable.hide-col-2  td:nth-child(2)  { display:none; }
+#allOrdersTable.hide-col-5  th:nth-child(5),  #allOrdersTable.hide-col-5  td:nth-child(5)  { display:none; }
+#allOrdersTable.hide-col-8  th:nth-child(8),  #allOrdersTable.hide-col-8  td:nth-child(8)  { display:none; }
+#allOrdersTable.hide-col-9  th:nth-child(9),  #allOrdersTable.hide-col-9  td:nth-child(9)  { display:none; }
+#allOrdersTable.hide-col-10 th:nth-child(10), #allOrdersTable.hide-col-10 td:nth-child(10) { display:none; }
+#allOrdersTable.hide-col-11 th:nth-child(11), #allOrdersTable.hide-col-11 td:nth-child(11) { display:none; }
+#allOrdersTable.hide-col-12 th:nth-child(12), #allOrdersTable.hide-col-12 td:nth-child(12) { display:none; }
+#allOrdersTable.hide-col-13 th:nth-child(13), #allOrdersTable.hide-col-13 td:nth-child(13) { display:none; }
+#allOrdersTable.hide-col-14 th:nth-child(14), #allOrdersTable.hide-col-14 td:nth-child(14) { display:none; }
+#allOrdersTable.hide-col-15 th:nth-child(15), #allOrdersTable.hide-col-15 td:nth-child(15) { display:none; }
+#allOrdersTable.hide-col-16 th:nth-child(16), #allOrdersTable.hide-col-16 td:nth-child(16) { display:none; }
+</style>
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h4>所有訂單全覽</h4>
     <div>
@@ -22,6 +36,10 @@
         <option value="no" selected>未匯出</option>
     </select>
     <span class="badge bg-secondary ms-2" id="totalCount">載入中...</span>
+    <div class="ms-auto dropdown">
+        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">顯示欄位</button>
+        <ul class="dropdown-menu p-2" style="min-width:140px;" id="colToggleMenu"></ul>
+    </div>
 </div>
 
 <div class="table-responsive">
@@ -43,6 +61,7 @@
                 <th>來源</th>
                 <th>已收款</th>
                 <th>匯出狀態</th>
+                <th>匯款後五碼</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -94,6 +113,7 @@
             </div>
         </div>
         <div class="mb-2"><label>備註</label><input type="text" class="form-control" id="edit-userComment"></div>
+        <div class="mb-2"><label>匯款後五碼</label><input type="text" class="form-control" id="edit-bankCode" maxlength="5" placeholder="12345"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -251,6 +271,7 @@ function renderTable() {
             "<td>" + (o.source || "") + "</td>" +
             '<td><input type="checkbox" class="form-check-input chk-paid" data-idx="' + realIdx + '"' + (o.paid ? ' checked' : '') + '></td>' +
             "<td>" + (o.exported ? '<span style="color:green">✓ ' + (o.exportedAt || '已匯出') + '</span>' : '') + "</td>" +
+            "<td>" + (o.bankCode || "") + "</td>" +
             '<td>' +
                 '<button class="btn btn-sm btn-outline-primary me-1 btn-edit" data-idx="' + realIdx + '">編輯</button>' +
                 '<button class="btn btn-sm btn-outline-danger btn-delete" data-idx="' + realIdx + '">刪除</button>' +
@@ -276,6 +297,7 @@ $(document).on("click", ".btn-edit", function() {
     $("#edit-paymentMethod").val(o.paymentMethod);
     $("#edit-deliveryType").val(o.deliveryType || "宅配");
     $("#edit-userComment").val(o.userComment);
+    $("#edit-bankCode").val(o.bankCode || "");
     var modal = new bootstrap.Modal(document.getElementById("editModal"));
     modal.show();
 });
@@ -293,7 +315,8 @@ $("#saveEdit").on("click", function() {
         arrivalTime: $("#edit-arrivalTime").val(),
         paymentMethod: $("#edit-paymentMethod").val(),
         deliveryType: $("#edit-deliveryType").val(),
-        userComment: $("#edit-userComment").val()
+        userComment: $("#edit-userComment").val(),
+        bankCode: $("#edit-bankCode").val()
     };
     $.ajax({
         url: "api_updateOrder",
@@ -529,6 +552,41 @@ $("#edit-shippingDate").on("change", function() {
     if (isNaN(d.getTime())) return;
     d.setDate(d.getDate() + 1);
     $("#edit-arrivalDate").val(d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate());
+});
+
+// Column visibility toggle
+var COL_DEFS = [
+    { label: "填單日期",  col: 2,  visible: true  },
+    { label: "地址",      col: 5,  visible: true  },
+    { label: "到貨日期",  col: 8,  visible: true  },
+    { label: "時段",      col: 9,  visible: false },
+    { label: "付款方式",  col: 10, visible: true  },
+    { label: "配送方式",  col: 11, visible: false },
+    { label: "備註",      col: 12, visible: false },
+    { label: "來源",      col: 13, visible: false },
+    { label: "已收款",    col: 14, visible: true  },
+    { label: "匯出狀態",  col: 15, visible: false },
+    { label: "匯款後五碼", col: 16, visible: true  },
+];
+
+var $table = $("#allOrdersTable");
+var $menu  = $("#colToggleMenu");
+
+COL_DEFS.forEach(function(def) {
+    if (!def.visible) $table.addClass("hide-col-" + def.col);
+    var $li = $('<li><label class="dropdown-item d-flex align-items-center gap-2 py-1" style="cursor:pointer;">' +
+        '<input type="checkbox" ' + (def.visible ? 'checked' : '') + ' data-col="' + def.col + '"> ' +
+        def.label + '</label></li>');
+    $menu.append($li);
+});
+
+$menu.on("change", "input[type=checkbox]", function() {
+    var col = $(this).data("col");
+    if ($(this).is(":checked")) {
+        $table.removeClass("hide-col-" + col);
+    } else {
+        $table.addClass("hide-col-" + col);
+    }
 });
 
 loadAllOrders();

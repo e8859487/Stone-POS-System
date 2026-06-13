@@ -18,4 +18,13 @@
                   }
               });
 
+    // Auto-load tomorrow's orders on page load if data exists
+    var _tomorrow = new Date();
+    _tomorrow.setDate(_tomorrow.getDate() + 1);
+    var _tomorrowKey = _tomorrow.getFullYear() + '/' + (_tomorrow.getMonth() + 1) + '/' + _tomorrow.getDate();
+    if (enableDatesArray.indexOf(_tomorrowKey) !== -1) {
+        $('#GoogleSpreadShippingDate-input').datepicker('setDate', _tomorrow);
+        $('#GoogleSpreadShippingDate-input > input').trigger('change');
+    }
+
 </script>
