@@ -57,8 +57,10 @@ class FirestoreRepository(DataRepository):
         docs = query.stream()
         orders = []
         for doc in docs:
-            dp = DataPack.from_firestore_dict(doc.to_dict())
+            d = doc.to_dict()
+            dp = DataPack.from_firestore_dict(d)
             dp._doc_id = doc.id
+            dp._timestamp = d.get('timestamp')
             orders.append(dp)
         return orders
 

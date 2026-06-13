@@ -29,6 +29,7 @@
         <thead>
             <tr>
                 <th>#</th>
+                <th>填單日期</th>
                 <th>出貨日期</th>
                 <th>收件人</th>
                 <th>地址</th>
@@ -236,6 +237,7 @@ function renderTable() {
         var realIdx = _allOrders.indexOf(o);
         var row = "<tr>" +
             "<td>" + (i + 1) + "</td>" +
+            "<td>" + (o.submittedAt || "") + "</td>" +
             "<td>" + (o.shippingDate || "") + "</td>" +
             "<td>" + (o.name || "") + "</td>" +
             "<td>" + (o.address || "") + "</td>" +
@@ -516,6 +518,18 @@ function showImportPreview(data) {
     var modal = new bootstrap.Modal(document.getElementById("importPreviewModal"));
     modal.show();
 }
+
+// Auto-fill arrivalDate as shippingDate + 1 day when editing
+$("#edit-shippingDate").on("change", function() {
+    var val = $(this).val().trim();
+    if (!val) return;
+    var parts = val.split("/");
+    if (parts.length !== 3) return;
+    var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (isNaN(d.getTime())) return;
+    d.setDate(d.getDate() + 1);
+    $("#edit-arrivalDate").val(d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate());
+});
 
 loadAllOrders();
 checkNewGoogleFormData();
