@@ -1,39 +1,63 @@
 // Shorthand for $( document ).ready()
 $(function() {
     console.log( "ready!" );
-//    ExportCSV
+
+    // Display column indices (1-based) from OrderTable, in desired screen order:
+    // 姓名(1), 件數(6), 電話(2), 手機(3), 地址(4), 代收金額(5), 備註(8), 希望配達時間(10), 出貨日期(11), 預定配達日期(12)
+    var DISPLAY_COLS = [1, 6, 2, 3, 4, 5, 8, 10, 11, 12];
+
+    function buildDisplayTable() {
+        $('#DisplayTable').remove();
+        var $src = $('table#OrderTable');
+        if ($src.length === 0) return;
+
+        var $display = $('<table id="DisplayTable" class="table table-hover table-bordered"></table>');
+        $src.find('tr').each(function() {
+            var $tr = $('<tr></tr>');
+            var $cells = $(this).find('th, td');
+            DISPLAY_COLS.forEach(function(colIdx) {
+                $tr.append($cells.eq(colIdx - 1).clone());
+            });
+            $display.append($tr);
+        });
+
+        $src.hide();
+        $('#queryResponse').append($display);
+    }
+
+//    CSV export: temporarily reveal hidden OrderTable with all 24 columns, export, then re-hide
     function hideFixContentColumns(){
-        $('td:nth-child(7),th:nth-child(7)').hide();
-        $('td:nth-child(9),th:nth-child(9)').hide();
-        $('td:nth-child(13),th:nth-child(13)').hide();
-        $('td:nth-child(14),th:nth-child(14)').hide();
-        $('td:nth-child(15),th:nth-child(15)').hide();
-        $('td:nth-child(16),th:nth-child(16)').hide();
-        $('td:nth-child(17),th:nth-child(17)').hide();
-        $('td:nth-child(18),th:nth-child(18)').hide();
-        $('td:nth-child(19),th:nth-child(19)').hide();
-        $('td:nth-child(20),th:nth-child(20)').hide();
-        $('td:nth-child(21),th:nth-child(21)').hide();
-        $('td:nth-child(22),th:nth-child(22)').hide();
-        $('td:nth-child(23),th:nth-child(23)').hide();
-        $('td:nth-child(24),th:nth-child(24)').hide();
+        $('table#OrderTable td:nth-child(7),table#OrderTable th:nth-child(7)').hide();
+        $('table#OrderTable td:nth-child(9),table#OrderTable th:nth-child(9)').hide();
+        $('table#OrderTable td:nth-child(13),table#OrderTable th:nth-child(13)').hide();
+        $('table#OrderTable td:nth-child(14),table#OrderTable th:nth-child(14)').hide();
+        $('table#OrderTable td:nth-child(15),table#OrderTable th:nth-child(15)').hide();
+        $('table#OrderTable td:nth-child(16),table#OrderTable th:nth-child(16)').hide();
+        $('table#OrderTable td:nth-child(17),table#OrderTable th:nth-child(17)').hide();
+        $('table#OrderTable td:nth-child(18),table#OrderTable th:nth-child(18)').hide();
+        $('table#OrderTable td:nth-child(19),table#OrderTable th:nth-child(19)').hide();
+        $('table#OrderTable td:nth-child(20),table#OrderTable th:nth-child(20)').hide();
+        $('table#OrderTable td:nth-child(21),table#OrderTable th:nth-child(21)').hide();
+        $('table#OrderTable td:nth-child(22),table#OrderTable th:nth-child(22)').hide();
+        $('table#OrderTable td:nth-child(23),table#OrderTable th:nth-child(23)').hide();
+        $('table#OrderTable td:nth-child(24),table#OrderTable th:nth-child(24)').hide();
     }
 
     function showFixContentColumns(){
-        $('td:nth-child(7),th:nth-child(7)').show();
-        $('td:nth-child(9),th:nth-child(9)').show();
-        $('td:nth-child(13),th:nth-child(13)').show();
-        $('td:nth-child(14),th:nth-child(14)').show();
-        $('td:nth-child(15),th:nth-child(15)').show();
-        $('td:nth-child(16),th:nth-child(16)').show();
-        $('td:nth-child(17),th:nth-child(17)').show();
-        $('td:nth-child(18),th:nth-child(18)').show();
-        $('td:nth-child(19),th:nth-child(19)').show();
-        $('td:nth-child(20),th:nth-child(20)').show();
-        $('td:nth-child(21),th:nth-child(21)').show();
-        $('td:nth-child(22),th:nth-child(22)').show();
-        $('td:nth-child(23),th:nth-child(23)').show();
-        $('td:nth-child(24),th:nth-child(24)').show();
+        $('table#OrderTable td:nth-child(7),table#OrderTable th:nth-child(7)').show();
+        $('table#OrderTable td:nth-child(9),table#OrderTable th:nth-child(9)').show();
+        $('table#OrderTable td:nth-child(13),table#OrderTable th:nth-child(13)').show();
+        $('table#OrderTable td:nth-child(14),table#OrderTable th:nth-child(14)').show();
+        $('table#OrderTable td:nth-child(15),table#OrderTable th:nth-child(15)').show();
+        $('table#OrderTable td:nth-child(16),table#OrderTable th:nth-child(16)').show();
+        $('table#OrderTable td:nth-child(17),table#OrderTable th:nth-child(17)').show();
+        $('table#OrderTable td:nth-child(18),table#OrderTable th:nth-child(18)').show();
+        $('table#OrderTable td:nth-child(19),table#OrderTable th:nth-child(19)').show();
+        $('table#OrderTable td:nth-child(20),table#OrderTable th:nth-child(20)').show();
+        $('table#OrderTable td:nth-child(21),table#OrderTable th:nth-child(21)').show();
+        $('table#OrderTable td:nth-child(22),table#OrderTable th:nth-child(22)').show();
+        $('table#OrderTable td:nth-child(23),table#OrderTable th:nth-child(23)').show();
+        $('table#OrderTable td:nth-child(24),table#OrderTable th:nth-child(24)').show();
     }
 
     $( "#exportCSV" ).on( "click", function() {
@@ -54,9 +78,11 @@ $(function() {
         "filename": today + "出貨葡萄訂單.csv",
         "appendTo": "#output"
         }
+        $('table#OrderTable').show();
         showFixContentColumns()
         $("table#OrderTable").table2csv(options); // default action is 'download'
         hideFixContentColumns()
+        $('table#OrderTable').hide();
 
         // Mark orders as exported
         var rawDate = $('#GoogleSpreadShippingDate-input > input').val();
@@ -126,10 +152,10 @@ $(function() {
                             $("#totoalNumbers").html(data.totoalNumbers)
                             //$("#totoalNumbersOf2").html(data.totoalNumbersOf2)
                             //$("#totoalNumbersOfPack").html(data.totoalNumbersOfPack)
+                            buildDisplayTable()
                        }else{
                            alert("error");
                        }
-                       hideFixContentColumns()
 
                     }
                     ,
