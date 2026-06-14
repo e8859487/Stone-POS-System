@@ -32,3 +32,7 @@ DATA_BACKEND = config.get('Database', 'DATA_BACKEND', fallback='google_sheets')
 # DeepSeek
 DEEPSEEK_API_KEY = config.get('DeepSeek', 'API_KEY', fallback=None)
 DEEPSEEK_MODEL = config.get('DeepSeek', 'MODEL', fallback='deepseek-chat')
+
+# LINE Bot
+LINE_CHANNEL_SECRET = config.get('LineBot', 'LINE_CHANNEL_SECRET', fallback='')
+LINE_CHANNEL_ACCESS_TOKEN = config.get('LineBot', 'LINE_CHANNEL_ACCESS_TOKEN', fallback='')

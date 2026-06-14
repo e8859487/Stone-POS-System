@@ -1,4 +1,3 @@
-import os
 from linebot.v3 import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
@@ -9,9 +8,7 @@ from linebot.v3.webhooks import MessageEvent, TextMessageContent
 
 import DataParser
 from data_repository_factory import get_repository
-
-LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET', '')
-LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN', '')
+from GlobalSettings import LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN
 
 configuration = Configuration(access_token=LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
