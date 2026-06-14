@@ -7,6 +7,8 @@ import Controls
 from ReadGoogleExcel import initService, GoogleMgr
 from data_repository_factory import get_repository
 import GlobalSettings
+from line_bot_handler import handle_webhook as linebot_handle_webhook
+from linebot.v3.exceptions import InvalidSignatureError as LineBotInvalidSignatureError
 import static.photoGallery.common_tools as tools
 
 
@@ -588,16 +590,12 @@ def print_index_table():
 # === Line Bot ===
 @app.route('/linebot/webhook', methods=['POST'])
 def linebot_webhook():
-    import flask
-    from line_bot_handler import handle_webhook
-    from linebot.v3.exceptions import InvalidSignatureError
-
     signature = flask.request.headers.get('X-Line-Signature', '')
     body = flask.request.get_data(as_text=True)
 
     try:
-        handle_webhook(body, signature)
-    except InvalidSignatureError:
+        linebot_handle_webhook(body, signature)
+    except LineBotInvalidSignatureError:
         return 'Invalid signature', 400
 
     return 'OK'
