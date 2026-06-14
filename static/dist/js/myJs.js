@@ -55,7 +55,7 @@ $(function() {
         "appendTo": "#output"
         }
         showFixContentColumns()
-        $("table").first().table2csv(options); // default action is 'download'
+        $("table#OrderTable").table2csv(options); // default action is 'download'
         hideFixContentColumns()
 
         // Mark orders as exported
