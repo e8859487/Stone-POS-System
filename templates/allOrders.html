@@ -113,6 +113,7 @@
             </div>
         </div>
         <div class="mb-2"><label>備註</label><input type="text" class="form-control" id="edit-userComment"></div>
+        <div class="mb-2"><label>Google 註解</label><input type="text" class="form-control" id="edit-googleComment"></div>
         <div class="mb-2"><label>匯款後五碼</label><input type="text" class="form-control" id="edit-bankCode" maxlength="5" placeholder="12345"></div>
       </div>
       <div class="modal-footer">
@@ -297,6 +298,7 @@ $(document).on("click", ".btn-edit", function() {
     $("#edit-paymentMethod").val(o.paymentMethod);
     $("#edit-deliveryType").val(o.deliveryType || "宅配");
     $("#edit-userComment").val(o.userComment);
+    $("#edit-googleComment").val(o.googleComment || "");
     $("#edit-bankCode").val(o.bankCode || "");
     var modal = new bootstrap.Modal(document.getElementById("editModal"));
     modal.show();
@@ -316,6 +318,7 @@ $("#saveEdit").on("click", function() {
         paymentMethod: $("#edit-paymentMethod").val(),
         deliveryType: $("#edit-deliveryType").val(),
         userComment: $("#edit-userComment").val(),
+        googleComment: $("#edit-googleComment").val(),
         bankCode: $("#edit-bankCode").val()
     };
     $.ajax({

@@ -118,7 +118,8 @@ class DataPack(object):
             "paymentMethod": self.paymentMethod,
             "arrivalTime": self.arrivalTime,
             "deliveryType": self.deliveryType,
-            "bankCode": self.bankCode
+            "bankCode": self.bankCode,
+            "googleComment": self.googleComment
         }
 
     def toFirestoreDict(self, source="web"):
