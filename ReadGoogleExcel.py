@@ -93,7 +93,12 @@ def initService():
 
     # Auto-refresh expired token so user never needs to re-login
     if creds.expired and creds.refresh_token:
-        creds.refresh(Request())
+        try:
+            creds.refresh(Request())
+        except Exception:
+            # Refresh token revoked or expired – delete stale pickle
+            TOKEN_PATH.unlink(missing_ok=True)
+            return False
         with open(TOKEN_PATH, 'wb') as token:
             pickle.dump(creds, token)
 
