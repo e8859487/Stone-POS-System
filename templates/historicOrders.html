@@ -1,0 +1,183 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h4>歷史訂單查詢</h4>
+    <button id="refreshHistoric" class="btn btn-outline-secondary btn-sm">重新整理</button>
+</div>
+
+<div id="historicFilters" class="mb-3 d-flex align-items-center flex-wrap" style="gap:8px;">
+    <label>年份：</label>
+    <select id="filterYear" class="form-select form-select-sm" style="width:auto;">
+        <option value="">載入中...</option>
+    </select>
+    <label class="ms-2">出貨日期：</label>
+    <select id="filterShippingDate" class="form-select form-select-sm" style="width:auto;">
+        <option value="">全部</option>
+    </select>
+    <label class="ms-2">到貨日期：</label>
+    <select id="filterArrivalDate" class="form-select form-select-sm" style="width:auto;">
+        <option value="">全部</option>
+    </select>
+    <span class="badge bg-secondary ms-2" id="historicCount">-</span>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm" id="historicTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>填單日期</th>
+                <th>出貨日期</th>
+                <th>收件人</th>
+                <th>地址</th>
+                <th>電話</th>
+                <th>數量(箱)</th>
+                <th>到貨日期</th>
+                <th>時段</th>
+                <th>付款方式</th>
+                <th>配送方式</th>
+                <th>備註</th>
+                <th>已收款</th>
+                <th>匯出狀態</th>
+            </tr>
+        </thead>
+        <tbody id="historicTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+window.addEventListener("load", function() {
+
+var _historicOrders = [];
+
+function loadYears() {
+    $.ajax({
+        url: "api_availableYears",
+        type: "get",
+        dataType: "json",
+        success: function(data) {
+            var $sel = $("#filterYear");
+            $sel.empty();
+            if (!data.isSuccess || data.years.length === 0) {
+                $sel.append('<option value="">（無歷史資料）</option>');
+                return;
+            }
+            for (var i = 0; i < data.years.length; i++) {
+                $sel.append('<option value="' + data.years[i] + '">' + data.years[i] + ' 年</option>');
+            }
+            // Default to first (most recent) year
+            $sel.val(data.years[0]);
+            loadOrders(data.years[0]);
+        },
+        error: function() {
+            $("#filterYear").html('<option value="">載入失敗</option>');
+        }
+    });
+}
+
+function loadOrders(year) {
+    if (!year) return;
+    $("#historicCount").text("載入中...");
+    $("#historicTableBody").empty();
+    $.ajax({
+        url: "api_historicOrders?year=" + encodeURIComponent(year),
+        type: "get",
+        dataType: "json",
+        success: function(data) {
+            if (!data.isSuccess) {
+                $("#historicCount").text("載入失敗：" + (data.msg || "unknown"));
+                return;
+            }
+            _historicOrders = data.orders;
+            buildDateFilters();
+            renderTable();
+        },
+        error: function(xhr) {
+            $("#historicCount").text("載入失敗 (" + xhr.status + ")");
+        }
+    });
+}
+
+function buildDateFilters() {
+    var shipDates = {}, arrDates = {};
+    for (var i = 0; i < _historicOrders.length; i++) {
+        var s = _historicOrders[i].shippingDate || "";
+        var a = _historicOrders[i].arrivalDate || "";
+        if (s) shipDates[s] = true;
+        if (a) arrDates[a] = true;
+    }
+    fillSelect("#filterShippingDate", shipDates);
+    fillSelect("#filterArrivalDate", arrDates);
+}
+
+function fillSelect(sel, dates) {
+    var $sel = $(sel);
+    $sel.find("option:not(:first)").remove();
+    var sorted = Object.keys(dates).sort();
+    for (var j = 0; j < sorted.length; j++) {
+        $sel.append('<option value="' + sorted[j] + '">' + sorted[j] + '</option>');
+    }
+}
+
+function getFiltered() {
+    var ship = $("#filterShippingDate").val();
+    var arr = $("#filterArrivalDate").val();
+    return _historicOrders.filter(function(o) {
+        if (ship && o.shippingDate !== ship) return false;
+        if (arr && o.arrivalDate !== arr) return false;
+        return true;
+    });
+}
+
+function renderTable() {
+    var year = $("#filterYear").val() || "";
+    var filtered = getFiltered();
+    var total = _historicOrders.length;
+    var label = "共 " + filtered.length + " 筆";
+    if (filtered.length < total) label += "（篩選中，" + year + " 年共 " + total + " 筆）";
+    else label += "（" + year + " 年）";
+    $("#historicCount").text(label);
+
+    var tbody = $("#historicTableBody");
+    tbody.empty();
+    for (var i = 0; i < filtered.length; i++) {
+        var o = filtered[i];
+        var exportedCell = o.exported
+            ? '<span style="color:green">✓ ' + (o.exportedAt || '已匯出') + '</span>'
+            : '';
+        var paidCell = o.paid ? '✓' : '';
+        var row = "<tr>" +
+            "<td>" + (i + 1) + "</td>" +
+            "<td>" + (o.submittedAt || "") + "</td>" +
+            "<td>" + (o.shippingDate || "") + "</td>" +
+            "<td>" + (o.name || "") + "</td>" +
+            "<td>" + (o.address || "") + "</td>" +
+            "<td>" + (o.mPhone || o.phone || "") + "</td>" +
+            "<td>" + (o.numbers || "") + "</td>" +
+            "<td>" + (o.arrivalDate || "") + "</td>" +
+            "<td>" + (o.arrivalTime || "") + "</td>" +
+            "<td>" + (o.paymentMethod || "") + "</td>" +
+            "<td>" + (o.deliveryType || "宅配") + "</td>" +
+            "<td>" + (o.userComment || "") + "</td>" +
+            "<td>" + paidCell + "</td>" +
+            "<td>" + exportedCell + "</td>" +
+            "</tr>";
+        tbody.append(row);
+    }
+}
+
+$("#filterYear").on("change", function() {
+    loadOrders($(this).val());
+    // Reset date filters
+    $("#filterShippingDate").val("");
+    $("#filterArrivalDate").val("");
+});
+$("#filterShippingDate").on("change", renderTable);
+$("#filterArrivalDate").on("change", renderTable);
+$("#refreshHistoric").on("click", function() {
+    loadOrders($("#filterYear").val());
+});
+
+loadYears();
+
+}); // end window.addEventListener
+</script>

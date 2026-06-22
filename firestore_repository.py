@@ -26,7 +26,10 @@ class FirestoreRepository(DataRepository):
     def __init__(self):
         _init_firebase()
         self.db = firestore.client()
-        self.collection = self.db.collection('orders')
+        self.collection = self.db.collection('orders_2026')
+
+    def get_year_collection(self, year):
+        return self.db.collection('orders_{}'.format(year))
 
     def add_order(self, data_pack, source="web"):
         doc = data_pack.toFirestoreDict(source=source)

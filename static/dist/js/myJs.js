@@ -104,6 +104,30 @@ $(function() {
         }
     });
 
+    $( "#exportPNG" ).on( "click", function() {
+        var captureArea = document.getElementById('pngCaptureArea');
+        if (!captureArea || $.trim($("#totoalNumbers").text()) === '') {
+            alert('請先選擇日期查詢出貨資料');
+            return;
+        }
+        var rawDate = $.trim($('#GoogleSpreadShippingDate-input > input').val());
+        var inputDate = new Date(rawDate);
+        var filename;
+        if (rawDate && !isNaN(inputDate.getTime())) {
+            var month = ("0" + (inputDate.getMonth() + 1)).slice(-2);
+            var day = ("0" + inputDate.getDate()).slice(-2);
+            filename = month + day + "出貨總整理.png";
+        } else {
+            filename = "出貨總整理.png";
+        }
+        html2canvas(captureArea, { backgroundColor: '#ffffff', scale: 2 }).then(function(canvas) {
+            var link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    });
+
     $( "#test" ).on( "click", function() {
             hideFixContentColumns()
 

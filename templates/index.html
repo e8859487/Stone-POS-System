@@ -64,6 +64,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" href="{{url_for('historic_orders')}}">
+                  <span data-feather="archive"></span>
+                  歷史訂單
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" href="{{url_for('new_orders')}}">
                   <span data-feather="shopping-cart"></span>
                   新增至 Google 表單
@@ -112,6 +118,8 @@
     <script src="../static/dist/js/myJs.js?v={{range(1, 5100) | random }}"></script>
     <!-- table 2 csv-->
     <script src="../static/dist/js/table2csv.min.js"></script>
+    <!-- html2canvas for PNG export -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="../static/dist/js/bootstrap-datepicker.min.js"></script>
     <script src="../static/dist/js/bootstrap-datepicker.zh-TW.min.js"></script>
 
@@ -127,11 +135,13 @@
           }else if ("{{ NavIndex }}" == 2) {
             $("#sidebarMenu > div > ul > li:nth-child(2) > a").addClass("active")
           }else if ("{{ NavIndex }}" == 3) {
-            $("#sidebarMenu > div > ul > li:nth-child(3) > a").addClass("active")
-          }else if ("{{ NavIndex }}" == 4) {
             $("#sidebarMenu > div > ul > li:nth-child(4) > a").addClass("active")
+          }else if ("{{ NavIndex }}" == 4) {
+            $("#sidebarMenu > div > ul > li:nth-child(5) > a").addClass("active")
           }else if ("{{ NavIndex }}" == 5) {
             $("#sidebarMenu > div > ul > li:nth-child(2) > a").addClass("active")
+          }else if ("{{ NavIndex }}" == 6) {
+            $("#sidebarMenu > div > ul > li:nth-child(3) > a").addClass("active")
           }
         }
         UpdateNavSelection()

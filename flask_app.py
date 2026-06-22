@@ -170,6 +170,54 @@ def all_orders():
     orderedDoc = render_template('allOrders.html')
     return render_template('index.html', table=orderedDoc, NavIndex=5)
 
+@app.route('/historic_orders')
+def historic_orders():
+    orderedDoc = render_template('historicOrders.html')
+    return render_template('index.html', table=orderedDoc, NavIndex=6)
+
+@app.route('/api_historicOrders')
+def api_historic_orders():
+    from firestore_repository import firestore as fs
+    from DataPack import DataPack as DP
+    year = flask.request.args.get('year', '')
+    if not year or not year.isdigit():
+        return jsonify({"isSuccess": False, "msg": "請提供年份"})
+    repo = get_repository()
+    col = repo.get_year_collection(year)
+    try:
+        docs = col.order_by('timestamp', direction=fs.Query.DESCENDING).stream()
+    except Exception:
+        docs = col.stream()
+    orders = []
+    for doc in docs:
+        d = doc.to_dict()
+        dp = DP.from_firestore_dict(d)
+        entry = dp.toDict()
+        entry['id'] = doc.id
+        ts = d.get('timestamp')
+        entry['submittedAt'] = ts.strftime('%Y/%m/%d %H:%M') if ts else ''
+        entry['arrivalTime'] = dp.arrivalTimeFormat
+        entry['paymentMethod'] = dp.paymentMethodFormat
+        entry['deliveryType'] = dp.deliveryTypeFormat
+        entry['exported'] = d.get('exported', False)
+        entry['exportedAt'] = d.get('exportedAt', '')
+        entry['paid'] = d.get('paid', False)
+        entry['source'] = d.get('source', '')
+        orders.append(entry)
+    return jsonify({"isSuccess": True, "orders": orders})
+
+@app.route('/api_availableYears')
+def api_available_years():
+    repo = get_repository()
+    collections = repo.db.collections()
+    years = []
+    for col in collections:
+        name = col.id
+        if name.startswith('orders_') and name[7:].isdigit() and len(name[7:]) == 4:
+            years.append(name[7:])
+    years.sort(reverse=True)
+    return jsonify({"isSuccess": True, "years": years})
+
 def _make_order_key(o):
     return "{}|{}|{}".format(o.get('name', ''), o.get('arrivalDate', ''), o.get('numbers', ''))
 
