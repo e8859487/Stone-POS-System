@@ -24,10 +24,45 @@ if GlobalSettings.SPREADSHEET_ID is None:
         '請修正 SETTING.ini 後重啟。'
     ).format(GlobalSettings.GOOGLE_SPREADSHEET_URL)
 
+_OAUTH_SKIP_PATHS = ('/authorize', '/oauth2callback', '/revoke', '/clear', '/static', '/linebot')
+
 @app.before_request
 def check_config():
     if _CONFIG_ERROR and not flask.request.path.startswith('/static'):
         return '<h2 style="color:red;">⚠ 設定錯誤</h2><p>{}</p>'.format(_CONFIG_ERROR), 500
+
+@app.before_request
+def auto_refresh_oauth():
+    """每次請求前自動檢查並 refresh OAuth token；無法 refresh 時重導向授權頁。"""
+    if any(flask.request.path.startswith(p) for p in _OAUTH_SKIP_PATHS):
+        return
+
+    import pathlib, pickle
+    from google.auth.transport.requests import Request
+    from ReadGoogleExcel import TOKEN_PATH, GoogleMgr
+    import google.oauth2.credentials
+
+    # 若 token.pickle 存在，嘗試 refresh
+    if TOKEN_PATH.exists():
+        try:
+            with open(TOKEN_PATH, 'rb') as f:
+                creds = pickle.load(f)
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                with open(TOKEN_PATH, 'wb') as f:
+                    pickle.dump(creds, f)
+                # 強制 initService() 重建 service
+                import ReadGoogleExcel
+                ReadGoogleExcel.service = None
+            if creds and creds.valid:
+                return  # token 正常，繼續
+        except Exception:
+            TOKEN_PATH.unlink(missing_ok=True)
+            import ReadGoogleExcel
+            ReadGoogleExcel.service = None
+
+    # token 不存在或無法 refresh → 導向授權
+    return flask.redirect(flask.url_for('authorize'))
 
 @app.route('/')
 def index():
