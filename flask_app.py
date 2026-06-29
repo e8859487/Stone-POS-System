@@ -456,6 +456,25 @@ def api_toggle_paid():
     except Exception as e:
         return jsonify({"isSuccess": False, "msg": str(e)})
 
+@app.route('/api_updateBankCode', methods=['POST'])
+def api_update_bank_code():
+    data = flask.request.get_json()
+    order_id = data.get('id')
+    bank_code = data.get('bankCode', '')
+    if not order_id:
+        return jsonify({"isSuccess": False, "msg": "缺少訂單 ID"})
+    if bank_code and (len(bank_code) != 5 or not bank_code.isdigit()):
+        return jsonify({"isSuccess": False, "msg": "匯款後五碼須為 5 位數字"})
+    repo = get_repository()
+    try:
+        update_fields = {'bankCode': bank_code}
+        if bank_code:
+            update_fields['paid'] = True
+        repo.collection.document(order_id).update(update_fields)
+        return jsonify({"isSuccess": True, "autoPaid": bool(bank_code)})
+    except Exception as e:
+        return jsonify({"isSuccess": False, "msg": str(e)})
+
 @app.route('/api_deleteOrder', methods=['POST'])
 def api_delete_order():
     data = flask.request.get_json()

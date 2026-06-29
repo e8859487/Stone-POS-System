@@ -272,7 +272,9 @@ function renderTable() {
             "<td>" + (o.source || "") + "</td>" +
             '<td><input type="checkbox" class="form-check-input chk-paid" data-idx="' + realIdx + '"' + (o.paid ? ' checked' : '') + '></td>' +
             "<td>" + (o.exported ? '<span style="color:green">✓ ' + (o.exportedAt || '已匯出') + '</span>' : '') + "</td>" +
-            "<td>" + (o.bankCode || "") + "</td>" +
+            '<td><span class="bank-code-display" data-idx="' + realIdx + '" style="cursor:pointer;min-width:60px;display:inline-block;">' + (o.bankCode || '<span style="color:#bbb">—</span>') + '</span>' +
+            '<input type="text" class="form-control form-control-sm bank-code-input d-none" data-idx="' + realIdx + '" value="' + (o.bankCode || '') + '" maxlength="5" style="width:80px;display:none!important;">' +
+            '</td>' +
             '<td>' +
                 '<button class="btn btn-sm btn-outline-primary me-1 btn-edit" data-idx="' + realIdx + '">編輯</button>' +
                 '<button class="btn btn-sm btn-outline-danger btn-delete" data-idx="' + realIdx + '">刪除</button>' +
@@ -359,6 +361,68 @@ $(document).on("click", ".btn-delete", function() {
         },
         error: function() { alert("刪除失敗"); }
     });
+});
+
+// Inline bank code edit
+$(document).on("click", ".bank-code-display", function() {
+    var $display = $(this);
+    var $input = $display.next(".bank-code-input");
+    $display.addClass("d-none");
+    $input.removeClass("d-none").css("display", "").focus().select();
+});
+
+$(document).on("blur", ".bank-code-input", function() {
+    var $input = $(this);
+    var idx = $input.data("idx");
+    var o = _allOrders[idx];
+    var newVal = $input.val().trim();
+
+    if (newVal && (newVal.length !== 5 || !/^\d{5}$/.test(newVal))) {
+        alert("匯款後五碼須為 5 位數字");
+        $input.val(o.bankCode || "").focus();
+        return;
+    }
+
+    $.ajax({
+        url: "api_updateBankCode",
+        type: "post",
+        contentType: "application/json",
+        data: JSON.stringify({ id: o.id, bankCode: newVal }),
+        dataType: "json",
+        success: function(data) {
+            if (data.isSuccess) {
+                o.bankCode = newVal;
+                var displayText = newVal || '<span style="color:#bbb">—</span>';
+                var $display = $input.prev(".bank-code-display");
+                $display.html(displayText);
+                $input.addClass("d-none");
+                // Flash green border
+                $display.css({"outline": "2px solid #28a745", "border-radius": "3px"});
+                setTimeout(function() { $display.css("outline", ""); }, 800);
+                // Auto-check 已收款 if bankCode was filled
+                if (data.autoPaid) {
+                    o.paid = true;
+                    $('input.chk-paid[data-idx="' + idx + '"]').prop("checked", true);
+                }
+            } else {
+                alert("更新失敗：" + data.msg);
+                $input.val(o.bankCode || "").focus();
+            }
+        },
+        error: function() {
+            alert("更新失敗");
+            $input.val(o.bankCode || "").focus();
+        }
+    });
+});
+
+$(document).on("keydown", ".bank-code-input", function(e) {
+    if (e.key === "Enter") $(this).blur();
+    if (e.key === "Escape") {
+        var idx = $(this).data("idx");
+        var o = _allOrders[idx];
+        $(this).val(o.bankCode || "").blur();
+    }
 });
 
 // Toggle paid
